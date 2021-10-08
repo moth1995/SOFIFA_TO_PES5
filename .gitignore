@@ -1,0 +1,6 @@
+*.mdb
+__pycache__
+build
+*.spec
+*.csv
+dist
