@@ -5,8 +5,8 @@ def copymdb(newname):
     # First we remove ascii characters
     newname = newname.encode('ascii',errors='ignore')
     newname = newname.decode()
-    print(newname)
-    print(type(newname))
+    #print(newname)
+    #print(type(newname))
     
     file=str(newname)+".mdb"
     with open(r'src\template.mdb',"rb") as rf_exe:
