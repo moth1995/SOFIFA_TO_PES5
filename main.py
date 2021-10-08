@@ -4,6 +4,7 @@ import time
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
+from tkinter import filedialog
 import sys
 import os
 import conseguir_jugadores
@@ -81,6 +82,8 @@ def get_leagues(session,web_opt):
 def convert(team,session,namelist,linklist,gamever):
     if team!="":
         if gamever!=0:
+            messagebox.showinfo(title=appname, message="Select the folder where you wanna save your file")
+            folder = filedialog.askdirectory(initialdir=os.path.expanduser('~/Documents'),title=appname)
             team=str(linklist[namelist.index(team)])
             time.sleep(5)
             links,filename = conseguir_jugadores.conseguir_jugadores(team,session)
@@ -103,17 +106,17 @@ def convert(team,session,namelist,linklist,gamever):
                 progress_text.set(str(process_players)+"/"+str(total_players)+" players converted")
                 root.update_idletasks()                
                 # Line below is for break the loop only when debugging
-                #break
+                break
             #print("fin")
             #print(players)
             if players!=[]:
                 if gamever==1:
                     #this is for mdb
-                    savefile.csv_to_mdb(filename,savefile.csv_parser(players))
+                    savefile.csv_to_mdb(folder+'/'+filename,savefile.csv_parser(players))
                     messagebox.showinfo(title=appname, message="Your mdb file for "+str(filename) + "\nhas been generated")
                 elif gamever==2:
                     #this is for csv
-                    savefile.write_csv(filename,players)
+                    savefile.write_csv(folder+'/'+filename,players)
                     messagebox.showinfo(title=appname, message="Your csv file for "+str(filename) + "\nhas been generated")
             else:
                 messagebox.showerror(title=appname, message="Couldn't retrieve data for players on " + str(filename))
@@ -134,27 +137,30 @@ def download_logos(session,league_name,clubnames,clublinks,resize):
     # size for unknow 464
     size_32 = 32, 32
     if clublinks!= []:
-        if not os.path.exists(league_name):
-            os.makedirs(league_name)
+        messagebox.showinfo(title=appname, message="Select the folder where you wanna save your logos")
+        folder = filedialog.askdirectory(initialdir=os.path.expanduser('~/Documents'),title=appname)
+        folder = folder + '/' + league_name
+        if not os.path.exists(folder):
+            os.makedirs(folder)
         for i in range(0,len(clublinks)):
             time.sleep(5)
             #print (f"downloading https://cdn.sofifa.com/teams/{clublinks[i].split('/')[2]}/360.png")
             img = session.get(f"https://cdn.sofifa.com/teams/{clublinks[i].split('/')[2]}/360.png")
-            with open(f"{league_name}/{clubnames[i]}.png", "wb") as image:
+            with open(f"{folder}/{clubnames[i]}.png", "wb") as image:
                 image.write(img.content)
             if (resize):
-                if not os.path.exists(f"{league_name}/64"):
-                    os.makedirs(f"{league_name}/64")
-                if not os.path.exists(f"{league_name}/32"):
-                    os.makedirs(f"{league_name}/32")
+                if not os.path.exists(f"{folder}/64"):
+                    os.makedirs(f"{folder}/64")
+                if not os.path.exists(f"{folder}/32"):
+                    os.makedirs(f"{folder}/32")
                 # first we resize to 64x64
-                im = Image.open(f"{league_name}/{clubnames[i]}.png")
+                im = Image.open(f"{folder}/{clubnames[i]}.png")
                 im.thumbnail(size_64, Image.ANTIALIAS)
-                im.save(f"{league_name}/64/{clubnames[i]}.png")
+                im.save(f"{folder}/64/{clubnames[i]}.png")
                 # first we resize to 32x32
-                im = Image.open(f"{league_name}/{clubnames[i]}.png")
+                im = Image.open(f"{folder}/{clubnames[i]}.png")
                 im.thumbnail(size_32, Image.ANTIALIAS)
-                im.save(f"{league_name}/32/{clubnames[i]}.png")
+                im.save(f"{folder}/32/{clubnames[i]}.png")
         messagebox.showinfo(title=appname, message="All logos downloaded!")
     else:
         messagebox.showerror(title=appname, message="Please select a League")
@@ -277,7 +283,6 @@ web_opt='&hl=en-US&attr=classic&layout=new&units=mks'#+'&r=210064&set=true'
 appname='SOFIFA to PES5/WE9/LE Stats Converter'
 ntnames,ntlinks,leag_names,leag_val,clubnames,clublinks=[],[],[],[],[],[]
 fifavers,fifaverslinks,updatename,updatelink=[],[],[],[]
-fifavers_available=['FIFA 21','FIFA 20']
 root = Tk()
 root.title(appname)
 w = 800 # width for the Tk root
