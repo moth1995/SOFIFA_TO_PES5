@@ -48,6 +48,12 @@ Then run the software, easy, uh?
 python3 main.py
 ```
 
+(Optional) To create mdb files you will need Microsoft Access Database Engine 2016 Redistributable
+
+```sh
+download it from here https://www.microsoft.com/en-us/download/details.aspx?id=54920
+```
+
 
 #### Building for source
 
