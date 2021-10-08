@@ -22,7 +22,7 @@ def fm_to_pes5(stat):
     #print(pes5_stat)
     return pes5_stat
 '''
-def fifa_to_pes5_1_a_8(stat):
+def fifa_to_PES5_1_a_8(stat):
     start=[1,3,5,7,8]
     stop =[3,5,7,8,9]
     #print(stat)
@@ -618,7 +618,7 @@ def conseguir_info_jugador(jugador,s):
         #print(posiciones)
         posicion_reg=posiciones[0]
         #print(posicion_reg)
-        dorsal=int(soup.find('ul', attrs={'class':'bp3-text-overflow-ellipsis pl text-right'}).find_all('li')[2].find('label').findNextSibling(text=True))
+        dorsal=int(soup.find('ul', attrs={'class':'bp3-text-overflow-ellipsis pl'}).find_all('li')[2].find('label').findNextSibling(text=True))
         #print(dorsal)
         #club=soup.find('div', attrs={'class':'player-card double-spacing'}).find('a').text
         club=indexes[2]
@@ -639,6 +639,7 @@ def conseguir_info_jugador(jugador,s):
 
 
 def player_scrapper(link,session):
+    #print (f"el link del jugador es {link}")
     nationalities = ["Austria", "Belgium", "Bulgaria", "Croatia", "Czech Republic", "Denmark", "England", "Finland", "France", "Germany", "Greece", 
     "Hungary", "Ireland", "Italy", "Latvia", "Netherlands", "Northern Ireland", "Norway", "Poland", "Portugal", "Romania", "Russia", "Scotland", "Serbia and Montenegro", 
     "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkey", "Ukraine", "Wales", "Cameroon", "Cote d'Ivoire", "Morocco", "Nigeria", 
@@ -672,9 +673,13 @@ def player_scrapper(link,session):
         csv_CLUB_NUMBER=dorsal
         csv_NATIONALITY=get_pes_5_nationality(nation,nationalities)
         csv_CLUB_TEAM=club
+        #return tuple([""]+[csv_NAME]+[csv_SHIRT_NAME]+csv_POSICIONES+[csv_REGISTERED_POSITION]+[int(csv_HEIGHT)]+[csv_STRONG_FOOT]+
+            #[csv_FAVOURED_SIDE]+PES5_stats+[1,1,1,1]+[csv_AGE]+[int(csv_WEIGHT)]+[csv_NATIONALITY]+[1,0,1,0,0,0,0,0,0,0,0,0,0,0,'N','None',0,0]+
+            #[csv_CLUB_TEAM]+[csv_CLUB_NUMBER])
         return tuple([""]+[csv_NAME]+[csv_SHIRT_NAME]+csv_POSICIONES+[csv_REGISTERED_POSITION]+[int(csv_HEIGHT)]+[csv_STRONG_FOOT]+
-            [csv_FAVOURED_SIDE]+PES5_stats+[1,1,1,1]+[csv_AGE]+[int(csv_WEIGHT)]+[csv_NATIONALITY]+[1,0,1,0,0,0,0,0,0,0,0,0,0,0,'N','None',0,0]+
+            [csv_FAVOURED_SIDE]+PES5_stats+[csv_AGE]+[int(csv_WEIGHT)]+[csv_NATIONALITY]+
             [csv_CLUB_TEAM]+[csv_CLUB_NUMBER])
+
     #print('el sitio esta dando un status code: '+str(status_code))
     else:
         return status_code
