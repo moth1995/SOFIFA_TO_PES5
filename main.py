@@ -5,14 +5,29 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
 import sys
-
+import os
 import conseguir_jugadores
 import jugador
 import savefile
-#from requests.sessions import session
+from tkinter.tix import *
+from PIL import Image
+
+def get_list_index_by_element(lista, element):
+    return lista.index(element)
+
+def update_webopt(fifa_ver):
+    global web_opt
+    print(fifa_ver)
+    print(fifaverslinks[get_list_index_by_element(fifavers,fifa_ver)])
+    temp = fifaverslinks[get_list_index_by_element(fifavers,fifa_ver)]
+    webopt='&hl=en-US&attr=classic&layout=new&units=mks'
+    web_opt = webopt + temp
+    
+    
 
 def get_teamlist(session,url,web_opt):
     #print(website+url+web_opt)
+    print(web_opt)
     time.sleep(5)
     site=session.get(website+url+web_opt,headers=headnav)
     #print(site.text)
@@ -44,6 +59,7 @@ def get_teamlist(session,url,web_opt):
         return [],[]
 
 def get_leagues(session,web_opt):
+    print(web_opt)
     time.sleep(5)
     lg_site=session.get(website+'/teams?type=club'+web_opt,headers=headnav)
     if (lg_site.status_code)==200:
@@ -78,6 +94,9 @@ def convert(team,session,namelist,linklist,gamever):
             #print(filename)
             #print("  ")
             players=[]
+            total_players = len(links)
+            process_players = 0
+            counter = 1
             for link in range(len(links)):
                 #print(links[link])
                 player=jugador.player_scrapper(links[link],session)
@@ -85,6 +104,13 @@ def convert(team,session,namelist,linklist,gamever):
                     messagebox.showerror(title=appname, message="Status code "+str(player))
                     break
                 players.append(player)
+                bar['value']+=(counter/total_players)*100
+                process_players+=counter
+                percent.set(str(int((process_players/total_players)*100))+"%")
+                progress_text.set(str(process_players)+"/"+str(total_players)+" players converted")
+                root.update_idletasks()                
+                # Line below is for break the loop only when debugging
+                #break
             #print("fin")
             #print(players)
             if players!=[]:
@@ -97,19 +123,59 @@ def convert(team,session,namelist,linklist,gamever):
                     savefile.write_csv(filename,players)
                     messagebox.showinfo(title=appname, message="Your csv file for "+str(filename) + "\nhas been generated")
                 else:
-                    messagebox.showerror(title=appname, message="The game version doesnt have support yet")
+                    messagebox.showerror(title=appname, message="Please select an output file type")
             else:
                 messagebox.showerror(title=appname, message="Couldn't retrieve data for players on " + str(filename))
+            bar['value']=0
+            percent.set("0%")
+            progress_text.set("0/0 players converted")
+            root.update_idletasks()                
         else:
-            messagebox.showerror(title=appname, message="Please select a PES Version")
+            messagebox.showerror(title=appname, message="Please select an output file type")
     else:
         messagebox.showerror(title=appname, message="Please select a club")
 
-def login(username,password):
-    global logedaslbl, fifavers, fifaverslinks,updatename,updatelink
-    payload = {'email': username, 'password': password,'submit':''}
+
+def download_logos(session,league_name,clubnames,clublinks,resize):
+    #print(f"resize value is {resize}")
+    # size for unknow 466
+    size_64 = 64, 64
+    # size for unknow 464
+    size_32 = 32, 32
+    if clublinks!= []:
+        if not os.path.exists(league_name):
+            os.makedirs(league_name)
+        for i in range(0,len(clublinks)):
+            time.sleep(5)
+            #print (f"downloading https://cdn.sofifa.com/teams/{clublinks[i].split('/')[2]}/360.png")
+            img = session.get(f"https://cdn.sofifa.com/teams/{clublinks[i].split('/')[2]}/360.png")
+            with open(f"{league_name}/{clubnames[i]}.png", "wb") as image:
+                image.write(img.content)
+            if (resize):
+                if not os.path.exists(f"{league_name}/64"):
+                    os.makedirs(f"{league_name}/64")
+                if not os.path.exists(f"{league_name}/32"):
+                    os.makedirs(f"{league_name}/32")
+                # first we resize to 64x64
+                im = Image.open(f"{league_name}/{clubnames[i]}.png")
+                im.thumbnail(size_64, Image.ANTIALIAS)
+                im.save(f"{league_name}/64/{clubnames[i]}.png")
+                # first we resize to 32x32
+                im = Image.open(f"{league_name}/{clubnames[i]}.png")
+                im.thumbnail(size_32, Image.ANTIALIAS)
+                im.save(f"{league_name}/32/{clubnames[i]}.png")
+        messagebox.showinfo(title=appname, message="All logos downloaded!")
+    else:
+        messagebox.showerror(title=appname, message="Please select a League")
+
+
+def login(username,password,webopt):
+    global logedaslbl, fifavers, fifaverslinks, updatename, updatelink, web_opt
+    print(webopt)
+    #payload = {'email': username, 'password': password,'submit':''}
+    payload = {'email': username, 'password': password,}
     #print (payload)
-    login_page = website+'/signIn/'
+    login_page = website+'/api/signIn/'
     s = requests.Session()
     s.post(login_page, data=payload,headers=headnav)
     r=s.get(website,headers=headnav)
@@ -125,26 +191,30 @@ def login(username,password):
         h2=BeautifulSoup(r.text,'html.parser').find('h2')
         for a in h2.find_all('div',attrs={'class':'bp3-menu'})[0].find_all('a',attrs={'class':'bp3-menu-item'}):
             fifavers.append(a.text)
-            fifaverslinks.append(a.get('href'))
+            fifaverslinks.append(a.get('href').replace('/','').replace('?','&'))
         for a in h2.find_all('div',attrs={'class':'bp3-menu'})[1].find_all('a',attrs={'class':'bp3-menu-item'}):
             updatename.append(a.text)
-            updatelink.append(a.get('href'))
+            updatelink.append(a.get('href').replace('/','').replace('?','&'))
         if fifavers!=[] and updatename!=[]:
             fifavercmb.config(values=fifavers)
             fifavercmb.set(fifavers[0])
             updatecmb.config(values=updatename)
             updatecmb.set(updatename[0])
-        return s
+        web_opt = webopt + updatelink[0]
+        print(web_opt)
+        return s, web_opt
 
 def load_clubs(*args):
     global clubnames,clublinks
     league_selected=lgcmb.get()
+    print(web_opt)
     clubnames,clublinks=get_teamlist(login_session,'/teams?type=club&lg[]='+str(leag_val[leag_names.index(league_selected)]),web_opt)
     clubcmb.config(values=clubnames)
     clubcmb.set("")
 
 
 def load_cmb(session,web_opt):
+    print(web_opt)
     global ntnames,ntlinks,leag_names,leag_val
     ntnames,ntlinks=get_teamlist(session,'/teams?type=national',web_opt)
     leag_names,leag_val=get_leagues(session,web_opt)
@@ -155,14 +225,15 @@ def load_cmb(session,web_opt):
         lgcmb.config(values=leag_names)
     
 
-def login_action(user,pw,webopt):
+def login_action(user,pw,web_opt):
     #print (user,pw)
     global login_session
-    login_session=login(user,pw)
+    login_session, web_opt=login(user,pw,web_opt)
     if login_session:
         root.deiconify()
         loginsc.destroy()
-        load_cmb(login_session,webopt)
+        load_cmb(login_session,web_opt)
+
     else:
         messagebox.showerror(title=appname, message="Login error please check again your credencials")
 
@@ -184,8 +255,8 @@ website='https://sofifa.com'
 headnav={'User-agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36'}
 login_session=False
 logedusername=""
-web_opt='&hl=en-US&attr=classic&layout=new&units=mks'
-appname='SOFIFA to PES Converter'
+web_opt='&hl=en-US&attr=classic&layout=new&units=mks'#+'&r=210064&set=true'
+appname='SOFIFA to PES5/WE9/LE Stats Converter'
 ntnames,ntlinks,leag_names,leag_val,clubnames,clublinks=[],[],[],[],[],[]
 fifavers,fifaverslinks,updatename,updatelink=[],[],[],[]
 fifavers_available=['FIFA 21','FIFA 20']
@@ -215,18 +286,17 @@ loginsc.resizable(False, False)
 
 
 
-username_lbl = Label(loginsc, text = 'Username:')
+username_lbl = Label(loginsc, text = 'E-Mail:')
 username_entry = Entry(loginsc,width=30)
 password_lbl = Label(loginsc, text = 'Password:')
 password_entry = Entry(loginsc,width=30)
 login_button=Button(loginsc,text='Login', command=lambda:login_action(username_entry.get(),password_entry.get(),web_opt))
-exit_button = Button(loginsc,text='Cancel', command=lambda:close(username_entry.get(),password_entry.get(),web_opt))
+exit_button = Button(loginsc,text='Cancel', command=lambda:close())
 logedaslbl=Label(root)
 loginsc.wm_protocol("WM_DELETE_WINDOW", lambda: close())
 root.wm_protocol("WM_DELETE_WINDOW", lambda: close())
 username_entry.bind('<Return>', lambda e: login_action(username_entry.get(),password_entry.get(),web_opt))
 password_entry.bind('<Return>', lambda e: login_action(username_entry.get(),password_entry.get(),web_opt))
-
 password_entry.default_show_val = password_entry['show']
 password_entry['show'] = "*"
 checkbutton = Checkbutton(loginsc,text="Hide password",onvalue=True,offvalue=False,command=toggle_password)
@@ -242,35 +312,73 @@ checkbutton.pack()
 login_button.pack()
 exit_button.pack()
 
-fifavercmb=ttk.Combobox(root,state="readonly", value=fifavers,width=8)
-updatecmb=ttk.Combobox(root,state="readonly", value=updatename,width=14)
+
+# We create a tip tool to show info over the GUI elements (on the root)
+
+tip = Balloon(root)
+# Now we set all to white (except for the root)
+for index,sub in enumerate (tip.subwidgets_all()) :
+    if index > 0:
+        sub.configure(bg='white') 
+# And delete an awful arrow
+tip.subwidget('label').forget() 
+
+fifavercmb = ttk.Combobox(root,state="readonly", value=fifavers,width=8)
+updatecmb = ttk.Combobox(root,state="readonly", value=updatename,width=14)
 ntcmb = ttk.Combobox(root,state="readonly", value=ntnames,width=20)
 lgcmb = ttk.Combobox(root,state="readonly", value=leag_names,width=24)
+resize_ckbtn = Checkbutton(root,text="Resize to 64 & 32 px?",onvalue=True,offvalue=False)
+resize_ckbtn.var = BooleanVar(value=False)
+resize_ckbtn['variable'] = resize_ckbtn.var
+
+download_btn = Button(root,text="Download League Logos", command=lambda:download_logos(login_session,lgcmb.get(),clubnames,clublinks,resize_ckbtn.var.get()))
+
+# Info to the user about the resize option
+tip.bind_widget(resize_ckbtn, balloonmsg = "If you enable this option it will download all the images\n\
+in their original size but also it will create two folders inside\n\
+one call 64 and other 32 where you can find your resized images")
+
 clubcmb = ttk.Combobox(root,state="readonly", value=clubnames,width=24)
 lgcmb.bind("<<ComboboxSelected>>", load_clubs)
-fifavercmb.bind("<<ComboboxSelected>>", print(fifavercmb.get()))
-verlbl=Label(root,text='Select your PES Version')
-option=IntVar()
-option.set('1')
-rbtn1=Radiobutton(root, text='mdb file', variable=option, value=1)
-rbtn2=Radiobutton(root, text='csv file', variable=option, value=2)
-nt_convert_btn=Button(root,text='Convert National Team', command=lambda:convert(ntcmb.get(),login_session,ntnames,ntlinks,option.get()))
-club_convert_btn=Button(root,text='Convert Club Team', command=lambda:convert(clubcmb.get(),login_session,clubnames,clublinks,option.get()))
+fifavercmb.bind("<<ComboboxSelected>>", lambda e: update_webopt(fifavercmb.get()))
+verlbl = Label(root,text='Select your output file type')
+option = IntVar()
+option.set('0')
+rbtn1 = Radiobutton(root, text='mdb file', variable=option, value=1)
+rbtn2 = Radiobutton(root, text='csv file', variable=option, value=2)
+nt_convert_btn = Button(root,text='Convert National Team', command=lambda:convert(ntcmb.get(),login_session,ntnames,ntlinks,option.get()))
+club_convert_btn = Button(root,text='Convert Club Team', command=lambda:convert(clubcmb.get(),login_session,clubnames,clublinks,option.get()))
 #con el codigo de abajo creamos un spinbox y le seteamos el valor default a mostrar en 2
 #sb = Spinbox(root, from_=1, to=12)
 #sb.delete(0,"end")
 #sb.insert(0,2)
-logedaslbl.place(x=0,y=0)
-#fifavercmb.place(x=0,y=60)
-#updatecmb.place(x=80,y=60)
-ntcmb.place(x=250,y=200)
-lgcmb.place(x=400,y=200)
-clubcmb.place(x=400,y=240)
-nt_convert_btn.place(x=250,y=280)
-#verlbl.place(x=340,y=320)
-#rbtn1.place(x=350,y=340)
-#rbtn2.place(x=410,y=340)
-club_convert_btn.place(x=410,y=280)
+
+percent = StringVar()
+progress_text = StringVar()
+percent.set("0%")
+progress_text.set("0/0 players converted")
+
+bar = ttk.Progressbar(root,orient=HORIZONTAL,length=300)
+bar.place(x = 260, y = 380)
+
+percentLabel = Label(root,textvariable=percent).place(x = 260, y = 410)
+taskLabel = Label(root,textvariable=progress_text).place(x = 260, y = 430)
+
+
+logedaslbl.place(x = 0, y= 0)
+# Not implemented the select fifa version
+fifavercmb.place(x=0,y=60)
+updatecmb.place(x=80,y=60)
+ntcmb.place(x = 250, y = 200)
+lgcmb.place(x = 400, y = 200)
+download_btn.place(x = 600, y = 200)
+resize_ckbtn.place(x = 600, y = 240)
+clubcmb.place(x = 400, y = 240)
+nt_convert_btn.place(x = 250, y = 280)
+verlbl.place(x = 340, y = 320)
+rbtn1.place(x = 340, y = 340)
+rbtn2.place(x = 420, y = 340)
+club_convert_btn.place(x = 410 , y = 280)
 root.resizable(False, False)
 root.withdraw()
 root.mainloop() 
