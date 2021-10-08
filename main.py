@@ -9,7 +9,7 @@ import os
 import conseguir_jugadores
 import jugador
 import savefile
-from tkinter.tix import *
+#from tkinter.tix import *
 from PIL import Image
 
 def get_list_index_by_element(lista, element):
@@ -315,13 +315,13 @@ exit_button.pack()
 
 # We create a tip tool to show info over the GUI elements (on the root)
 
-tip = Balloon(root)
+#tip = Balloon(root)
 # Now we set all to white (except for the root)
-for index,sub in enumerate (tip.subwidgets_all()) :
-    if index > 0:
-        sub.configure(bg='white') 
+#for index,sub in enumerate (tip.subwidgets_all()) :
+#    if index > 0:
+#        sub.configure(bg='white') 
 # And delete an awful arrow
-tip.subwidget('label').forget() 
+#tip.subwidget('label').forget() 
 
 fifavercmb = ttk.Combobox(root,state="readonly", value=fifavers,width=8)
 updatecmb = ttk.Combobox(root,state="readonly", value=updatename,width=14)
@@ -334,9 +334,9 @@ resize_ckbtn['variable'] = resize_ckbtn.var
 download_btn = Button(root,text="Download League Logos", command=lambda:download_logos(login_session,lgcmb.get(),clubnames,clublinks,resize_ckbtn.var.get()))
 
 # Info to the user about the resize option
-tip.bind_widget(resize_ckbtn, balloonmsg = "If you enable this option it will download all the images\n\
-in their original size but also it will create two folders inside\n\
-one call 64 and other 32 where you can find your resized images")
+#tip.bind_widget(resize_ckbtn, balloonmsg = "If you enable this option it will download all the images\n\
+#in their original size but also it will create two folders inside\n\
+#one call 64 and other 32 where you can find your resized images")
 
 clubcmb = ttk.Combobox(root,state="readonly", value=clubnames,width=24)
 lgcmb.bind("<<ComboboxSelected>>", load_clubs)
