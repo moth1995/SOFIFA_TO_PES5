@@ -34,7 +34,7 @@ def csv_parser(csv_data):
     list_of_list = list(map(list, csv_data))
     #print(list_of_list)
     #index_rem=[73,74,75,76,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99]
-    index_rem=[77,78]
+    index_rem=[-2,-1]
     index_text=[1,2,17,18,75,72]
     #here we modify the csv to be compatible with dkz mdb file
     for i in range(0,len(list_of_list)):
@@ -100,13 +100,13 @@ def csv_to_mdb(mdb,rows):
                         t_46,t_47,t_48,t_49,t_50,t_51,t_52,t_53,t_54,t_55,
                         t_58,t_59,t_60,t_61,t_62,t_63,t_64,t_65,t_66,t_67,t_68,t_69,t_70,t_71,t_72,t_73,t_74,t_75,t_76,t_77,t_78,
                         t_79,t_80,
-                        t_6,t_4,t_125,t_3,
+                        t_6,t_4,t_125,t_3
                         )
                     VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,
                     ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,
                     ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,
                     ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,
-                    ?,?,)
+                    ?,?)
             ''')
     #now we iterate every row in the list of tuple
     for row in rows:
