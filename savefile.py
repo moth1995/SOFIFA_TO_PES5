@@ -9,7 +9,7 @@ def copymdb(newname):
     #print(type(newname))
     
     file=str(newname)+".mdb"
-    with open(r'src\template.mdb',"rb") as rf_exe:
+    with open(r'mdb_template\template.mdb',"rb") as rf_exe:
         chunk_size=4096
         with open(file,"wb") as wf_exe:
             rf_exe_chunk = rf_exe.read(chunk_size)
