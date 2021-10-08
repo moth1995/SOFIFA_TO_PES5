@@ -1,8 +1,13 @@
 import pyodbc
 import csv
+import os
 def copymdb(newname):
-    #print(newname)
-    #print(type(newname))
+    # First we remove ascii characters
+    newname = newname.encode('ascii',errors='ignore')
+    newname = newname.decode()
+    print(newname)
+    print(type(newname))
+    
     file=str(newname)+".mdb"
     with open(r'src\template.mdb',"rb") as rf_exe:
         chunk_size=4096
@@ -28,7 +33,8 @@ def csv_parser(csv_data):
     # Get all rows of csv from csv_reader object as list of list
     list_of_list = list(map(list, csv_data))
     #print(list_of_list)
-    index_rem=[73,74,75,76,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99]
+    #index_rem=[73,74,75,76,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99]
+    index_rem=[77,78]
     index_text=[1,2,17,18,75,72]
     #here we modify the csv to be compatible with dkz mdb file
     for i in range(0,len(list_of_list)):
@@ -77,8 +83,13 @@ def csv_parser(csv_data):
 def csv_to_mdb(mdb,rows):
     #create the new mdb
     file=copymdb(mdb)
+    #print(pyodbc.drivers())
+    driver = [i for i in pyodbc.drivers() if i.startswith('Microsoft Access Driver')][0]
+    #print(file)
+    file = os.path.abspath(file)
+    #print(file)
     #now we open the created db
-    conn = pyodbc.connect(r'Driver={Microsoft Access Driver (*.mdb)};DBQ='+file+';')
+    conn = pyodbc.connect(fr'Driver={driver};DBQ={file};')
     cursor = conn.cursor()
     #please check the template and view the description to understand the name of every col
     sql = ('''
@@ -89,13 +100,13 @@ def csv_to_mdb(mdb,rows):
                         t_46,t_47,t_48,t_49,t_50,t_51,t_52,t_53,t_54,t_55,
                         t_58,t_59,t_60,t_61,t_62,t_63,t_64,t_65,t_66,t_67,t_68,t_69,t_70,t_71,t_72,t_73,t_74,t_75,t_76,t_77,t_78,
                         t_79,t_80,
-                        t_6,t_4,t_125,t_3,t_82
+                        t_6,t_4,t_125,t_3,
                         )
                     VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,
                     ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,
                     ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,
                     ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,
-                    ?,?,?)
+                    ?,?,)
             ''')
     #now we iterate every row in the list of tuple
     for row in rows:
@@ -116,10 +127,7 @@ def create_csv(filename):
         "FREE KICK ACCURACY","CURLING","HEADING","JUMP","TECHNIQUE","AGGRESSION","MENTALITY","GOAL KEEPING","TEAM WORK","CONSISTENCY",
         "CONDITION / FITNESS","DRIBBLING","TACTIAL DRIBBLE","POSITIONING","REACTION","PLAYMAKING","PASSING","SCORING","1-1 SCORING",
         "POST PLAYER","LINES","MIDDLE SHOOTING","SIDE","CENTRE","PENALTIES","1-TOUCH PASS","OUTSIDE","MARKING","SLIDING","COVERING",
-        "D-LINE CONTROL","PENALTY STOPPER","1-ON-1 STOPPER","LONG THROW","INJURY TOLERANCE","DRIBBLE STYLE","FREE KICK STYLE","PK STYLE",
-        "DROP KICK STYLE","AGE","WEIGHT","NATIONALITY","SKIN COLOR","FACE TYPE","PRESET FACE NUMBER","HEAD WIDTH","NECK LENGTH","NECK WIDTH",
-        "SHOULDER HEIGHT","SHOULDER WIDTH","CHEST MEASUREMENT","WAIST CIRCUMFERENCE","ARM CIRCUMFERENCE","LEG CIRCUMFERENCE",
-        "CALF CIRCUMFERENCE","LEG LENGTH","WRISTBAND","WRISTBAND COLOR","INTERNATIONAL NUMBER","CLASSIC NUMBER","CLUB TEAM","CLUB NUMBER"])
+        "D-LINE CONTROL","PENALTY STOPPER","1-ON-1 STOPPER","LONG THROW","INJURY TOLERANCE","AGE","WEIGHT","NATIONALITY","CLUB TEAM","CLUB NUMBER"])
     return file
 
 def write_csv(filename,players):
