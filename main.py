@@ -18,19 +18,9 @@ def my_tip(obj, text_info):
 def get_list_index_by_element(lista, element):
     return lista.index(element)
 
-def update_webopt(fifa_ver):
-    global web_opt
-    print(fifa_ver)
-    print(fifaverslinks[get_list_index_by_element(fifavers,fifa_ver)])
-    temp = fifaverslinks[get_list_index_by_element(fifavers,fifa_ver)]
-    webopt='&hl=en-US&attr=classic&layout=new&units=mks'
-    web_opt = webopt + temp
-    
-    
-
 def get_teamlist(session,url,web_opt):
     #print(website+url+web_opt)
-    print(web_opt)
+    #print(web_opt)
     time.sleep(5)
     site=session.get(website+url+web_opt,headers=headnav)
     #print(site.text)
@@ -62,7 +52,7 @@ def get_teamlist(session,url,web_opt):
         return [],[]
 
 def get_leagues(session,web_opt):
-    print(web_opt)
+    #print(web_opt)
     time.sleep(5)
     lg_site=session.get(website+'/teams?type=club'+web_opt,headers=headnav)
     if (lg_site.status_code)==200:
@@ -125,8 +115,6 @@ def convert(team,session,namelist,linklist,gamever):
                     #this is for csv
                     savefile.write_csv(filename,players)
                     messagebox.showinfo(title=appname, message="Your csv file for "+str(filename) + "\nhas been generated")
-                else:
-                    messagebox.showerror(title=appname, message="Please select an output file type")
             else:
                 messagebox.showerror(title=appname, message="Couldn't retrieve data for players on " + str(filename))
             bar['value']=0
@@ -174,7 +162,7 @@ def download_logos(session,league_name,clubnames,clublinks,resize):
 
 def login(username,password,webopt):
     global logedaslbl, fifavers, fifaverslinks, updatename, updatelink, web_opt
-    print(webopt)
+    #print(webopt)
     #payload = {'email': username, 'password': password,'submit':''}
     payload = {'email': username, 'password': password,}
     #print (payload)
@@ -204,20 +192,20 @@ def login(username,password,webopt):
             updatecmb.config(values=updatename)
             updatecmb.set(updatename[0])
         web_opt = webopt + updatelink[0]
-        print(web_opt)
+        #print(web_opt)
         return s, web_opt
 
 def load_clubs(*args):
     global clubnames,clublinks
     league_selected=lgcmb.get()
-    print(web_opt)
+    #print(web_opt)
     clubnames,clublinks=get_teamlist(login_session,'/teams?type=club&lg[]='+str(leag_val[leag_names.index(league_selected)]),web_opt)
     clubcmb.config(values=clubnames)
     clubcmb.set("")
 
 
 def load_cmb(session,web_opt):
-    print(web_opt)
+    #print(web_opt)
     global ntnames,ntlinks,leag_names,leag_val
     ntnames,ntlinks=get_teamlist(session,'/teams?type=national',web_opt)
     leag_names,leag_val=get_leagues(session,web_opt)
@@ -226,7 +214,34 @@ def load_cmb(session,web_opt):
         ntcmb.config(values=ntnames)
     if leag_names!=[]:
         lgcmb.config(values=leag_names)
-    
+
+def update_webopt(fifa_ver, update_selected, session):
+    global web_opt, updatename
+    # If update_selected is empty then it comes from fifavercmb
+    if update_selected == "":
+        #print(fifa_ver)
+        #print(fifaverslinks[get_list_index_by_element(fifavers,fifa_ver)])
+        temp = fifaverslinks[get_list_index_by_element(fifavers,fifa_ver)]
+        webopt='&hl=en-US&attr=classic&layout=new&units=mks'
+        web_opt = webopt + temp
+        updatename=[]
+        r = session.get(f"{website}/{web_opt}")
+        h2=BeautifulSoup(r.text,'html.parser').find('h2')
+        for a in h2.find_all('div',attrs={'class':'bp3-menu'})[1].find_all('a',attrs={'class':'bp3-menu-item'}):
+            updatename.append(a.text)
+            updatelink.append(a.get('href').replace('/','').replace('?','&'))
+        if  updatename!=[]:
+            updatecmb.config(values=updatename)
+            updatecmb.set(updatename[0])
+        load_cmb(session,web_opt)
+    # Else comes from updatecmb
+    elif fifa_ver == "":
+        #print(update_selected)
+        #print(updatelink[get_list_index_by_element(updatename,update_selected)])
+        temp = updatelink[get_list_index_by_element(updatename,update_selected)]
+        webopt='&hl=en-US&attr=classic&layout=new&units=mks'
+        web_opt = webopt + temp
+        load_cmb(session,web_opt)
 
 def login_action(user,pw,web_opt):
     #print (user,pw)
@@ -266,7 +281,7 @@ fifavers_available=['FIFA 21','FIFA 20']
 root = Tk()
 root.title(appname)
 w = 800 # width for the Tk root
-h = 700 # height for the Tk root
+h = 600 # height for the Tk root
 # get screen width and height
 ws = root.winfo_screenwidth() # width of the screen
 hs = root.winfo_screenheight() # height of the screen
@@ -333,12 +348,17 @@ one call 64 and other 32 where you can find your resized images")
 
 clubcmb = ttk.Combobox(root,state="readonly", value=clubnames,width=24)
 lgcmb.bind("<<ComboboxSelected>>", load_clubs)
-fifavercmb.bind("<<ComboboxSelected>>", lambda e: update_webopt(fifavercmb.get()))
+fifa_ver_lbl = Label(root,text='FIFA Version')
+update_lbl = Label(root,text='Update Date')
+fifavercmb.bind("<<ComboboxSelected>>", lambda e: update_webopt(fifavercmb.get(), "", login_session))
+updatecmb.bind("<<ComboboxSelected>>", lambda e: update_webopt("", updatecmb.get(), login_session))
 verlbl = Label(root,text='Select your output file type')
 option = IntVar()
 option.set('0')
 rbtn1 = Radiobutton(root, text='mdb file', variable=option, value=1)
 rbtn2 = Radiobutton(root, text='csv file', variable=option, value=2)
+nt_lbl = Label(root,text='National teams')
+club_lbl = Label(root,text='Club teams')
 nt_convert_btn = Button(root,text='Convert National Team', command=lambda:convert(ntcmb.get(),login_session,ntnames,ntlinks,option.get()))
 club_convert_btn = Button(root,text='Convert Club Team', command=lambda:convert(clubcmb.get(),login_session,clubnames,clublinks,option.get()))
 #con el codigo de abajo creamos un spinbox y le seteamos el valor default a mostrar en 2
@@ -350,28 +370,31 @@ percent = StringVar()
 progress_text = StringVar()
 percent.set("0%")
 progress_text.set("0/0 players converted")
-
 bar = ttk.Progressbar(root,orient=HORIZONTAL,length=300)
 bar.place(x = 260, y = 380)
-
 percentLabel = Label(root,textvariable=percent).place(x = 260, y = 410)
 taskLabel = Label(root,textvariable=progress_text).place(x = 260, y = 430)
 
+copyright_lbl = Label(root,text='Developed by PES Indie Team ©')
 
 logedaslbl.place(x = 0, y= 0)
-# Not implemented the select fifa version
-fifavercmb.place(x=0,y=60)
+fifa_ver_lbl.place(x=1,y=35)
+update_lbl.place(x=80,y=35)
+fifavercmb.place(x=1,y=60)
 updatecmb.place(x=80,y=60)
+nt_lbl.place(x = 250, y = 175)
+club_lbl.place(x = 400, y = 175)
 ntcmb.place(x = 250, y = 200)
 lgcmb.place(x = 400, y = 200)
 download_btn.place(x = 600, y = 200)
 resize_ckbtn.place(x = 600, y = 240)
 clubcmb.place(x = 400, y = 240)
 nt_convert_btn.place(x = 250, y = 280)
+club_convert_btn.place(x = 410 , y = 280)
 verlbl.place(x = 340, y = 320)
 rbtn1.place(x = 340, y = 340)
 rbtn2.place(x = 420, y = 340)
-club_convert_btn.place(x = 410 , y = 280)
+copyright_lbl.place(x = 1, y = 580)
 root.resizable(False, False)
 root.withdraw()
 root.mainloop() 
