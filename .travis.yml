@@ -9,6 +9,7 @@ python:
   - 3.9
 install:
   - pip install -r requirements.txt
+  - pip install pyinstaller
 script:
   - pyinstaller main.py --name SoFIFA_to_PES5_WE9_LE --noconsole
 after_success:
