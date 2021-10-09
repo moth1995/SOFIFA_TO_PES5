@@ -121,9 +121,9 @@ def convert(team,session,namelist,linklist,gamever):
             else:
                 messagebox.showerror(title=appname, message="Couldn't retrieve data for players on " + str(filename))
             bar['value']=0
-            percent.set("0%")
-            progress_text.set("0/0 players converted")
-            root.update_idletasks()                
+            percent.set("")
+            progress_text.set("")
+            root.update_idletasks()
         else:
             messagebox.showerror(title=appname, message="Please select an output file type")
     else:
@@ -142,6 +142,9 @@ def download_logos(session,league_name,clubnames,clublinks,resize):
         folder = folder + '/' + league_name
         if not os.path.exists(folder):
             os.makedirs(folder)
+        total_logos = len(clublinks)
+        process_logos = 0
+        counter = 1            
         for i in range(0,len(clublinks)):
             time.sleep(5)
             #print (f"downloading https://cdn.sofifa.com/teams/{clublinks[i].split('/')[2]}/360.png")
@@ -161,7 +164,17 @@ def download_logos(session,league_name,clubnames,clublinks,resize):
                 im = Image.open(f"{folder}/{clubnames[i]}.png")
                 im.thumbnail(size_32, Image.ANTIALIAS)
                 im.save(f"{folder}/32/{clubnames[i]}.png")
+            bar['value']+=(counter/total_logos)*100
+            process_logos+=counter
+            percent.set(str(int((process_logos/total_logos)*100))+"%")
+            progress_text.set(str(process_logos)+"/"+str(total_logos)+" logos downloaded")
+            root.update_idletasks()
         messagebox.showinfo(title=appname, message="All logos downloaded!")
+        bar['value']=0
+        percent.set("")
+        progress_text.set("")
+        root.update_idletasks()                
+
     else:
         messagebox.showerror(title=appname, message="Please select a League")
 
