@@ -1,6 +1,6 @@
 # SOFIFA_TO_PES5/WE9/LE
 
-[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://app.travis-ci.com/moth1995/SOFIFA_TO_PES5.svg?branch=main)
+[![Build Status](https://app.travis-ci.com/moth1995/SOFIFA_TO_PES5.svg?branch=main)](https://app.travis-ci.com/moth1995/SOFIFA_TO_PES5)
 
 This is one of the most powerful tools I made for PES5/WE9/LE editing, this creates a file to import sofifa stats to the game with DKZ DB EDITOR or my OF TEAM EDITOR tool in csv format, sadly there's not a proper formula for this one
 
