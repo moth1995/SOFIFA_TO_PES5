@@ -1,0 +1,10 @@
+language: python
+python:
+  - 3.9
+  - pypy
+install:
+  - pip install -r requirements.txt
+script:
+  - pyinstaller "main.py" --name "SoFIFA to PES5_WE9_LE" --noconsole
+after_success:
+  - cp -R mdb_template/ dist/SoFIFA?to?PES5_WE9_LE/mdb_template/
