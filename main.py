@@ -243,7 +243,8 @@ def update_webopt(fifa_ver, update_selected, session):
         temp = fifaverslinks[get_list_index_by_element(fifavers,fifa_ver)]
         webopt='&hl=en-US&attr=classic&layout=new&units=mks'
         web_opt = webopt + temp
-        updatename=[]
+        updatename = []
+        updatelink = []
         r = session.get(f"{website}/{web_opt}")
         h2=BeautifulSoup(r.text,'html.parser').find('h2')
         for a in h2.find_all('div',attrs={'class':'bp3-menu'})[1].find_all('a',attrs={'class':'bp3-menu-item'}):
