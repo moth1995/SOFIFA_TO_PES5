@@ -106,7 +106,7 @@ def convert(team,session,namelist,linklist,gamever):
                 progress_text.set(str(process_players)+"/"+str(total_players)+" players converted")
                 root.update_idletasks()                
                 # Line below is for break the loop only when debugging
-                break
+                #break
             #print("fin")
             #print(players)
             if players!=[]:
@@ -387,8 +387,8 @@ club_convert_btn = Button(root,text='Convert Club Team', command=lambda:convert(
 
 percent = StringVar()
 progress_text = StringVar()
-percent.set("0%")
-progress_text.set("0/0 players converted")
+percent.set("")
+progress_text.set("")
 bar = ttk.Progressbar(root,orient=HORIZONTAL,length=300)
 bar.place(x = 260, y = 380)
 percentLabel = Label(root,textvariable=percent).place(x = 260, y = 410)
