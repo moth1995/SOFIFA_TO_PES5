@@ -10,252 +10,111 @@ import time
 from bs4 import BeautifulSoup
 from datetime import datetime
 
-'''
-#generacion random de stats, esto funcionaba para football manager nada mas, lo dejo a modo ejemplo
-def fm_to_pes5(stat):
-    start=[40,43,46,49,52,55,58,61,64,67,70,73,76,79,82,85,88,91,94,97]
-    stop =[43,46,49,52,55,58,61,64,67,70,73,76,79,82,85,88,91,94,97,100]
-    #print(stat)
-    stat=round(stat)
-    #print(stat)
-    pes5_stat=random.randrange(start[stat-1],stop[stat-1])
-    #print(pes5_stat)
-    return pes5_stat
-'''
 def fifa_to_PES5_1_a_8(stat):
-    start=[1,3,5,7,8]
-    stop =[3,5,7,8,9]
+    start=[1,2,4,5,7]
+    stop =[2,4,5,7,9]
     #print(stat)
     stat=round(stat)
     #print(stat)
-    pes5_stat=random.randrange(start[stat-1],stop[stat-1])
-    #print(pes5_stat)
-    return pes5_stat
-'''
-def fm_to_pes5_A_a_C(stat):
-    start=['C','C','C','C','C','B','B','B','B','B','B','B','B','B','A','A','A','A','A','A']
-    #print(stat)
-    stat=round(stat)
-    #print(stat)
-    pes5_stat=start[stat-1]
-    #print(pes5_stat)
-    return pes5_stat
-'''
+    return random.randrange(start[stat-1],stop[stat-1])
+
 def convert_stats(stats,reg_pos,posiciones,overall,weak_foot, skill_moves,attack_work_rate,defense_work_rate,s_h,traits,age):
     #Defino todas las variables de la columna OFENSIVA
-    FIFA_Centros=stats['Attacking']['Crossing']
-    FIFA_Definicion=stats['Attacking']['Finishing']
-    FIFA_Presicion_cabeza=stats['Attacking']['Heading Accuracy']
-    FIFA_Pases_cortos=stats['Attacking']['Short Passing']
-    FIFA_Voleas=stats['Attacking']['Volleys']
+    FIFA_crossing = stats['Attacking']['Crossing']
+    FIFA_finishing = stats['Attacking']['Finishing']
+    FIFA_heading_accuracy = stats['Attacking']['Heading Accuracy']
+    FIFA_short_passng = stats['Attacking']['Short Passing']
+    FIFA_volleys = stats['Attacking']['Volleys']
     #Defino todas las variables de la columna TECNICA
-    FIFA_Regates=stats['Skill']['Dribbling']
-    FIFA_Efecto=stats['Skill']['Curve']
-    FIFA_Presicion_faltas=stats['Skill']['FK Accuracy']
-    FIFA_Pases_largos=stats['Skill']['Long Passing']
-    FIFA_Control_del_balon=stats['Skill']['Ball Control']
+    FIFA_dribbling = stats['Skill']['Dribbling']
+    FIFA_curve = stats['Skill']['Curve']
+    FIFA_fk_accuracy = stats['Skill']['FK Accuracy']
+    FIFA_long_passing = stats['Skill']['Long Passing']
+    FIFA_ball_control = stats['Skill']['Ball Control']
     #Defino todas las variables de la columna MOVIMIENTO
-    FIFA_Aceleracion=stats['Movement']['Acceleration']
-    FIFA_Velocidad=stats['Movement']['Sprint Speed']
-    FIFA_Agilidad=stats['Movement']['Agility']
-    FIFA_Reflejos=stats['Movement']['Reactions']
-    FIFA_Equilibrio=stats['Movement']['Balance']
+    FIFA_acceleration = stats['Movement']['Acceleration']
+    FIFA_sprint_speed = stats['Movement']['Sprint Speed']
+    FIFA_agility = stats['Movement']['Agility']
+    FIFA_reactions = stats['Movement']['Reactions']
+    FIFA_balance = stats['Movement']['Balance']
     #Defino todas las variables de la columna POTENCIA
-    FIFA_Potencia=stats['Power']['Shot Power']
-    FIFA_Salto=stats['Power']['Jumping']
-    FIFA_Resistencia=stats['Power']['Stamina']
-    FIFA_Fuerza=stats['Power']['Strength']
-    FIFA_Tiros_lejanos=stats['Power']['Long Shots']
+    FIFA_shot_power = stats['Power']['Shot Power']
+    FIFA_jumping = stats['Power']['Jumping']
+    FIFA_stamina = stats['Power']['Stamina']
+    FIFA_strength = stats['Power']['Strength']
+    FIFA_long_shots = stats['Power']['Long Shots']
     #Defino todas las variables de la columna MENTALIDAD
-    FIFA_Agresividad=stats['Mentality']['Aggression']
-    FIFA_Intercepciones=stats['Mentality']['Interceptions']
-    FIFA_Colocacion=stats['Mentality']['Positioning']
-    FIFA_Vision=stats['Mentality']['Vision']
-    FIFA_Penaltis=stats['Mentality']['Penalties']
-    FIFA_Compostura=stats['Mentality']['Composure']
+    FIFA_aggression = stats['Mentality']['Aggression']
+    FIFA_interceptions = stats['Mentality']['Interceptions']
+    FIFA_positioning = stats['Mentality']['Positioning']
+    FIFA_vision = stats['Mentality']['Vision']
+    FIFA_penalties = stats['Mentality']['Penalties']
+    FIFA_composure = stats['Mentality']['Composure']
     #Defino todas las variables de la columna DEFENSA
-    FIFA_Conciencia_defensiva=stats['Defending']['Defensive Awareness']
-    FIFA_Robos=stats['Defending']['Standing Tackle']
-    FIFA_Entrada_agresiva=stats['Defending']['Sliding Tackle']
+    FIFA_defensive_awareness = stats['Defending']['Defensive Awareness']
+    FIFA_standing_tackle = stats['Defending']['Standing Tackle']
+    FIFA_sliding_tackle = stats['Defending']['Sliding Tackle']
     #Defino todas las variables de la columna PORTERO
-    FIFA_GK_Estirada=stats['Goalkeeping']['GK Diving']
-    FIFA_GK_Paradas=stats['Goalkeeping']['GK Handling']
-    FIFA_GK_Saques=stats['Goalkeeping']['GK Kicking']
-    FIFA_GK_Colocacion=stats['Goalkeeping']['GK Positioning']
-    FIFA_GK_Reflejos=stats['Goalkeeping']['GK Reflexes']
+    FIFA_GK_diving = stats['Goalkeeping']['GK Diving']
+    FIFA_GK_handling = stats['Goalkeeping']['GK Handling']
+    FIFA_GK_kicking = stats['Goalkeeping']['GK Kicking']
+    FIFA_GK_positioning = stats['Goalkeeping']['GK Positioning']
+    FIFA_GK_reflexes = stats['Goalkeeping']['GK Reflexes']
     #defino todas las variables de stats para pes en 0 en caso de que falle
-    PES5_Weak_Foot_Accuracy=PES5_Weak_Foot_Frequeency=PES5_Attack =PES5_Defense =PES5_Balance =PES5_Stamina =PES5_Speed =PES5_Acceleration =PES5_Response =PES5_Agility =PES5_Dribble_Accuracy =PES5_Dribble_Speed =PES5_Short_Pass_Accuracy =PES5_Short_Pass_Speed =PES5_Long_Pass_Accuracy =PES5_Long_Pass_Speed =PES5_Shot_Accuracy =PES5_Shot_Power =PES5_Shot_Technique =PES5_Free_Kick_Accuracy =PES5_Curling =PES5_Heading =PES5_Jump =PES5_Technique =PES5_Agression =PES5_Mentality =PES5_GK_Skills =PES5_Team_Work =PES5_Consistency=PES5_Condition=0
+    PES5_Weak_Foot_Accuracy = PES5_Weak_Foot_Frequeency=PES5_Attack =PES5_Defense =PES5_Balance =PES5_Stamina =PES5_Speed =PES5_Acceleration =PES5_Response =PES5_Agility =PES5_Dribble_Accuracy =PES5_Dribble_Speed =PES5_Short_Pass_Accuracy =PES5_Short_Pass_Speed =PES5_Long_Pass_Accuracy =PES5_Long_Pass_Speed =PES5_Shot_Accuracy =PES5_Shot_Power =PES5_Shot_Technique =PES5_Free_Kick_Accuracy =PES5_Curling =PES5_Heading =PES5_Jump =PES5_Technique =PES5_Agression =PES5_Mentality =PES5_GK_Skills =PES5_Team_Work =PES5_Consistency=PES5_Condition=0
     #defino en 0 todas las variables de las habilidades especiales 
-    PES5_Dribbling =PES5_Tactical_Dribble =PES5_Positioning =PES5_Reaction =PES5_Playmaking =PES5_Passing =PES5_Scoring =PES5_1_1_Scoring =PES5_Post_Player =PES5_Lines =PES5_Middle_Shooting =PES5_Side =PES5_Centre =PES5_Penalties =PES5_1_Touch_Pass =PES5_Outside =PES5_Marking =PES5_Sliding =PES5_Covering =PES5_D_Line_Control =PES5_Penalty_Stopper =PES5_1_On_1_Stopper =PES5_Long_Throw =0
-    if reg_pos!=0:
-        #convertir de fifa a pes 5 para jugadores
-        PES5_Weak_Foot_Accuracy=fifa_to_PES5_1_a_8(weak_foot)
-        PES5_Weak_Foot_Frequeency=fifa_to_PES5_1_a_8(weak_foot) - 1
-        PES5_Attack = FIFA_Colocacion
-        PES5_Defense = round((FIFA_Conciencia_defensiva+FIFA_Robos+FIFA_Entrada_agresiva+FIFA_Intercepciones)/4)
-        PES5_Balance = FIFA_Fuerza
-        PES5_Stamina = FIFA_Resistencia
-        PES5_Speed = FIFA_Velocidad
-        PES5_Acceleration = FIFA_Aceleracion
-        PES5_Response = FIFA_Reflejos
-        PES5_Agility = FIFA_Agilidad
-        PES5_Dribble_Accuracy = FIFA_Regates
-        PES5_Dribble_Speed = FIFA_Velocidad
-        PES5_Short_Pass_Accuracy = FIFA_Pases_cortos
-        PES5_Short_Pass_Speed = FIFA_Potencia
-        if FIFA_Pases_largos>FIFA_Centros:
-            PES5_Long_Pass_Accuracy = FIFA_Pases_largos
-        elif FIFA_Pases_largos<FIFA_Centros:
-            PES5_Long_Pass_Accuracy = FIFA_Centros
-        elif FIFA_Pases_largos==FIFA_Centros:
-            PES5_Long_Pass_Accuracy = FIFA_Pases_largos
-        PES5_Long_Pass_Speed = FIFA_Potencia
-        PES5_Shot_Accuracy = FIFA_Definicion
-        PES5_Shot_Power = FIFA_Potencia
-        if FIFA_Voleas>FIFA_Tiros_lejanos:
-            PES5_Shot_Technique = FIFA_Voleas
-        elif FIFA_Voleas<FIFA_Tiros_lejanos:
-            PES5_Shot_Technique = FIFA_Tiros_lejanos
-        elif FIFA_Voleas==FIFA_Tiros_lejanos:
-            PES5_Shot_Technique = FIFA_Voleas
-        PES5_Free_Kick_Accuracy = FIFA_Presicion_faltas
-        PES5_Curling = FIFA_Efecto
-        PES5_Heading = FIFA_Presicion_cabeza
-        PES5_Jump = FIFA_Salto
-        PES5_Technique = FIFA_Control_del_balon
-        PES5_Agression = 75
-        PES5_Mentality = FIFA_Compostura
-        PES5_GK_Skills = 50
-        PES5_Team_Work = FIFA_Vision
-        if round((FIFA_Compostura+FIFA_Resistencia)/2)>=86:
-            PES5_Consistency =8
-        elif round((FIFA_Compostura+FIFA_Resistencia)/2)<86 and round((FIFA_Compostura+FIFA_Resistencia)/2)>=80:
-            PES5_Consistency =7
-        elif round((FIFA_Compostura+FIFA_Resistencia)/2)<80 and round((FIFA_Compostura+FIFA_Resistencia)/2)>=73:
-            PES5_Consistency =6
-        elif round((FIFA_Compostura+FIFA_Resistencia)/2)<73 and round((FIFA_Compostura+FIFA_Resistencia)/2)>=68:
-            PES5_Consistency =5
-        elif round((FIFA_Compostura+FIFA_Resistencia)/2)<68 and round((FIFA_Compostura+FIFA_Resistencia)/2)>=60:
-            PES5_Consistency =4
-        elif round((FIFA_Compostura+FIFA_Resistencia)/2)<60 and round((FIFA_Compostura+FIFA_Resistencia)/2)>=50:
-            PES5_Consistency =3
-        elif round((FIFA_Compostura+FIFA_Resistencia)/2)<50 and round((FIFA_Compostura+FIFA_Resistencia)/2)>=40:
-            PES5_Consistency =2
-        elif round((FIFA_Compostura+FIFA_Resistencia)/2)<40 and round((FIFA_Compostura+FIFA_Resistencia)/2)>0:
-            PES5_Consistency =1
-        if overall>=90:
-            PES5_Condition =8
-        elif overall<90 and overall>=85:
-            PES5_Condition =7
-        elif overall<85 and overall>=80:
-            PES5_Condition =6
-        elif overall<80 and overall>=75:
-            PES5_Condition =5
-        elif overall<75 and overall>=70:
-            PES5_Condition =4
-        elif overall<70 and overall>=65:
-            PES5_Condition =3
-        elif overall<65 and overall>=60:
-            PES5_Condition =2
-        elif overall<60:
-            PES5_Condition =1
-    else:
-        #convertir de fifa a pes 5 para arqueros
-        PES5_Weak_Foot_Accuracy=fifa_to_PES5_1_a_8(weak_foot)
-        PES5_Weak_Foot_Frequeency=fifa_to_PES5_1_a_8(weak_foot) - 1
+    PES5_Dribbling = PES5_Tactical_Dribble =PES5_Positioning =PES5_Reaction =PES5_Playmaking =PES5_Passing =PES5_Scoring =PES5_1_1_Scoring =PES5_Post_Player =PES5_Lines =PES5_Middle_Shooting =PES5_Side =PES5_Centre =PES5_Penalties =PES5_1_Touch_Pass =PES5_Outside =PES5_Marking =PES5_Sliding =PES5_Covering =PES5_D_Line_Control =PES5_Penalty_Stopper =PES5_1_On_1_Stopper =PES5_Long_Throw =0
+
+    #convertir de fifa a pes 5 para jugadores
+
+    PES5_Weak_Foot_Accuracy=fifa_to_PES5_1_a_8(weak_foot)
+    PES5_Weak_Foot_Frequeency=int(round(FIFA_ball_control*40/650))
+    
+    PES5_Attack = int(round((FIFA_finishing + FIFA_dribbling + FIFA_positioning)/3)) - 10
+    if 'Complete Forward' in traits:
+        PES5_Attack += 5
+    if 'Poacher' in s_h:
+        PES5_Attack += 2
+    if 'Aerial Threat' in s_h:
+        PES5_Attack += 2
+    if 'Finesse Shot' in traits:
+        PES5_Attack += 2
+    if 'Clinical Finisher' in s_h:
+        PES5_Attack += 2
+    if reg_pos == 0:
         PES5_Attack = 30
-        PES5_Defense = FIFA_GK_Colocacion
-        if PES5_Defense<95:
-            PES5_Defense=PES5_Defense+5
-        PES5_Balance = FIFA_Fuerza
-        if PES5_Balance<95:
-            PES5_Balance=PES5_Balance+5
-        PES5_Stamina = 50
-        PES5_Speed = FIFA_Velocidad
-        if PES5_Speed<90:
-            PES5_Speed=PES5_Speed+10
-        PES5_Acceleration = FIFA_Aceleracion
-        if PES5_Acceleration<90:
-            PES5_Acceleration=PES5_Acceleration+10
-        PES5_Response = FIFA_GK_Reflejos
-        if PES5_Response<95:
-            PES5_Response=PES5_Response+5
-        PES5_Agility = FIFA_Reflejos
-        if PES5_Agility<90:
-            PES5_Agility=PES5_Agility+10
-        PES5_Dribble_Accuracy = 50
-        PES5_Dribble_Speed = FIFA_Velocidad
-        if PES5_Dribble_Speed<90:
-            PES5_Dribble_Speed=PES5_Dribble_Speed+10
-        PES5_Short_Pass_Accuracy = FIFA_Pases_cortos
-        PES5_Short_Pass_Speed = 50
-        if FIFA_Pases_largos>FIFA_Centros:
-            PES5_Long_Pass_Accuracy = FIFA_Pases_largos
-        elif FIFA_Pases_largos<FIFA_Centros:
-            PES5_Long_Pass_Accuracy = FIFA_Centros
-        elif FIFA_Pases_largos==FIFA_Centros:
-            PES5_Long_Pass_Accuracy = FIFA_Pases_largos
-        PES5_Long_Pass_Speed = 50
-        PES5_Shot_Accuracy = 50
-        PES5_Shot_Power = FIFA_GK_Saques
-        if PES5_Shot_Power<95:
-            PES5_Shot_Power=PES5_Shot_Power+5
-        PES5_Shot_Technique = 50
-        if FIFA_Presicion_faltas>50:
-            PES5_Free_Kick_Accuracy=FIFA_Presicion_faltas
-        else:
-            PES5_Free_Kick_Accuracy=50
-        if FIFA_Efecto>50:
-            PES5_Curling=FIFA_Efecto
-        else:
-            PES5_Curling = 50
-        PES5_Heading = 50
-        PES5_Jump = FIFA_Salto
-        if PES5_Jump<95:
-            PES5_Jump=PES5_Jump+5
-        PES5_Technique = 50
-        PES5_Agression = 75
-        PES5_Mentality = FIFA_Compostura
-        if PES5_Mentality<75:
-            PES5_Mentality=PES5_Mentality+25
-        PES5_GK_Skills = FIFA_GK_Paradas
-        if PES5_GK_Skills<95:
-            PES5_GK_Skills=PES5_GK_Skills+5
-        PES5_Team_Work = FIFA_Vision
-        if PES5_Team_Work<75:
-            PES5_Team_Work=PES5_Team_Work+25
-        if round((FIFA_Compostura+FIFA_Resistencia)/2)>=86:
-            PES5_Consistency =8
-        elif round((FIFA_Compostura+FIFA_Resistencia)/2)<86 and round((FIFA_Compostura+FIFA_Resistencia)/2)>=80:
-            PES5_Consistency =7
-        elif round((FIFA_Compostura+FIFA_Resistencia)/2)<80 and round((FIFA_Compostura+FIFA_Resistencia)/2)>=73:
-            PES5_Consistency =6
-        elif round((FIFA_Compostura+FIFA_Resistencia)/2)<73 and round((FIFA_Compostura+FIFA_Resistencia)/2)>=68:
-            PES5_Consistency =5
-        elif round((FIFA_Compostura+FIFA_Resistencia)/2)<68 and round((FIFA_Compostura+FIFA_Resistencia)/2)>=60:
-            PES5_Consistency =4
-        elif round((FIFA_Compostura+FIFA_Resistencia)/2)<60 and round((FIFA_Compostura+FIFA_Resistencia)/2)>=50:
-            PES5_Consistency =3
-        elif round((FIFA_Compostura+FIFA_Resistencia)/2)<50 and round((FIFA_Compostura+FIFA_Resistencia)/2)>=40:
-            PES5_Consistency =2
-        elif round((FIFA_Compostura+FIFA_Resistencia)/2)<40 and round((FIFA_Compostura+FIFA_Resistencia)/2)>0:
-            PES5_Consistency =1
-        if overall>=90:
-            PES5_Condition =8
-        elif overall<90 and overall>=85:
-            PES5_Condition =7
-        elif overall<85 and overall>=80:
-            PES5_Condition =6
-        elif overall<80 and overall>=75:
-            PES5_Condition =5
-        elif overall<75 and overall>=70:
-            PES5_Condition =4
-        elif overall<70 and overall>=65:
-            PES5_Condition =3
-        elif overall<65 and overall>=60:
-            PES5_Condition =2
-        elif overall<60:
-            PES5_Condition =1
+    PES5_Defense = FIFA_defensive_awareness
+    PES5_Balance = int(round(FIFA_balance/2) + round(FIFA_strength/2))
+    PES5_Stamina = FIFA_stamina
+    PES5_Speed = FIFA_sprint_speed
+    PES5_Acceleration = FIFA_acceleration
+    PES5_Response = FIFA_reactions
+    if reg_pos == 0:
+        PES5_Response = FIFA_GK_reflexes
+    PES5_Agility = FIFA_agility
+    PES5_Dribble_Accuracy = FIFA_dribbling
+    PES5_Dribble_Speed = int(round(FIFA_dribbling/3) + round(FIFA_agility/3) + round(FIFA_ball_control /3))
+    PES5_Short_Pass_Accuracy = FIFA_short_passng
+    PES5_Short_Pass_Speed = FIFA_vision
+    PES5_Long_Pass_Accuracy = FIFA_long_passing
+    PES5_Long_Pass_Speed = int(round(FIFA_crossing/2) + round(FIFA_vision/2))
+    PES5_Shot_Accuracy = FIFA_finishing
+    PES5_Shot_Power = FIFA_shot_power
+    PES5_Shot_Technique = int(round(FIFA_finishing/3)+ round(FIFA_ball_control/3) + round(FIFA_volleys/3))
+    PES5_Free_Kick_Accuracy = FIFA_fk_accuracy
+    PES5_Curling = FIFA_curve
+    PES5_Heading = FIFA_heading_accuracy
+    PES5_Jump = FIFA_jumping
+    PES5_Technique = FIFA_ball_control
+    PES5_Agression = 75     # no formula for this stat yet
+    PES5_Mentality = FIFA_composure
+    PES5_GK_Skills = int(round((FIFA_GK_handling + FIFA_GK_diving + FIFA_GK_reflexes + FIFA_GK_positioning)/4))
+    PES5_Team_Work = FIFA_positioning
+    
+    PES5_Consistency =4     # no formula for this stat yet
+    PES5_Condition =int(round(FIFA_stamina/12.5))
+    
+    '''
     if 'Speed Dribbler (AI)' in traits:
         PES5_Dribbling = 1
     if 'Technical Dribbler (AI)' in traits:
@@ -298,27 +157,44 @@ def convert_stats(stats,reg_pos,posiciones,overall,weak_foot, skill_moves,attack
         PES5_1_On_1_Stopper = 1
     if 'Long Throw-in' in traits:
         PES5_Long_Throw = 1
+    '''
     PES5_Injury_Tolerance= 'B'
+    '''
     if 'Solid Player' in traits:
         PES5_Injury_Tolerance= 'A'
     elif 'Injury Prone' in traits:
         PES5_Injury_Tolerance= 'C'
+    '''
+    
+    
     stats_99=[PES5_Attack ,PES5_Defense ,PES5_Balance ,PES5_Stamina ,PES5_Speed ,
     PES5_Acceleration ,PES5_Response ,PES5_Agility ,PES5_Dribble_Accuracy ,PES5_Dribble_Speed ,PES5_Short_Pass_Accuracy ,PES5_Short_Pass_Speed ,
     PES5_Long_Pass_Accuracy ,PES5_Long_Pass_Speed ,PES5_Shot_Accuracy ,PES5_Shot_Power ,PES5_Shot_Technique ,PES5_Free_Kick_Accuracy ,
     PES5_Curling ,PES5_Heading ,PES5_Jump ,PES5_Technique ,PES5_Agression ,PES5_Mentality ,PES5_GK_Skills ,PES5_Team_Work]
     #print(stats_99)
+    
+    # If any stats is higher than 99 then we set it to 99, just a sanity check
+    
+    for i in range(len(stats_99)):
+        if stats_99 [i] > 99:
+            stats_99 [i] = 99
+    
+    # Random stats! only between a few number to have a little more of variety
+    
+    '''
     for stat in range(len(stats_99)):
         if stats_99[stat]!=99:
             stats_99[stat]=random.randrange(stats_99[stat]-1,stats_99[stat]+2)
         else:
             stats_99[stat]=random.randrange(stats_99[stat]-1,stats_99[stat]+1)
+    '''
     #print(stats_99)
     PES5_stats=[PES5_Weak_Foot_Accuracy,PES5_Weak_Foot_Frequeency]+stats_99+ [PES5_Consistency,
     PES5_Condition,PES5_Dribbling ,PES5_Tactical_Dribble ,PES5_Positioning ,PES5_Reaction ,PES5_Playmaking ,PES5_Passing ,PES5_Scoring ,
     PES5_1_1_Scoring ,PES5_Post_Player ,PES5_Lines ,PES5_Middle_Shooting ,PES5_Side ,PES5_Centre ,PES5_Penalties ,PES5_1_Touch_Pass ,
     PES5_Outside ,PES5_Marking ,PES5_Sliding ,PES5_Covering ,PES5_D_Line_Control ,PES5_Penalty_Stopper ,PES5_1_On_1_Stopper ,PES5_Long_Throw ,
     PES5_Injury_Tolerance]
+    
     return PES5_stats
 
 '''
