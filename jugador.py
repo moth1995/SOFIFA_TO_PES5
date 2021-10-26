@@ -70,7 +70,7 @@ def convert_stats(stats,reg_pos,posiciones,overall,weak_foot, skill_moves,attack
     PES5_Weak_Foot_Accuracy=fifa_to_PES5_1_a_8(weak_foot)
     PES5_Weak_Foot_Frequeency=int(round(FIFA_ball_control*40/650))
     
-    PES5_Attack = int(round((FIFA_finishing + FIFA_dribbling + FIFA_positioning)/3)) - 10
+    PES5_Attack = int(round((FIFA_finishing + FIFA_dribbling + FIFA_positioning)/3)) - 5
     if 'Complete Forward' in traits:
         PES5_Attack += 5
     if 'Poacher' in s_h:
@@ -84,14 +84,20 @@ def convert_stats(stats,reg_pos,posiciones,overall,weak_foot, skill_moves,attack
     if reg_pos == 0:
         PES5_Attack = 30
     PES5_Defense = FIFA_defensive_awareness
-    PES5_Balance = int(round(FIFA_balance/2) + round(FIFA_strength/2))
+    if reg_pos == 0:
+        PES5_Defense = FIFA_GK_positioning
+    PES5_Balance = FIFA_strength
     PES5_Stamina = FIFA_stamina
+    if reg_pos == 0:
+        PES5_Stamina += 45
     PES5_Speed = FIFA_sprint_speed
     PES5_Acceleration = FIFA_acceleration
     PES5_Response = FIFA_reactions
     if reg_pos == 0:
         PES5_Response = FIFA_GK_reflexes
     PES5_Agility = FIFA_agility
+    if reg_pos == 0:
+        PES5_Agility = FIFA_GK_diving
     PES5_Dribble_Accuracy = FIFA_dribbling
     PES5_Dribble_Speed = int(round(FIFA_dribbling/3) + round(FIFA_agility/3) + round(FIFA_ball_control /3))
     PES5_Short_Pass_Accuracy = FIFA_short_passng
@@ -108,12 +114,16 @@ def convert_stats(stats,reg_pos,posiciones,overall,weak_foot, skill_moves,attack
     PES5_Technique = FIFA_ball_control
     PES5_Agression = 75     # no formula for this stat yet
     PES5_Mentality = FIFA_composure
+    if reg_pos == 0:
+        PES5_Mentality = int(FIFA+composure/2) + 50
     PES5_GK_Skills = int(round((FIFA_GK_handling + FIFA_GK_diving + FIFA_GK_reflexes + FIFA_GK_positioning)/4))
     PES5_Team_Work = FIFA_positioning
-    
+    if reg_pos == 0:
+        PES5_Team_Work = PES5_Defense - random.randint(1,6)
     PES5_Consistency =4     # no formula for this stat yet
     PES5_Condition =int(round(FIFA_stamina/12.5))
-    
+    if reg_pos == 0:
+        PES5_Condition += 4
     '''
     if 'Speed Dribbler (AI)' in traits:
         PES5_Dribbling = 1
