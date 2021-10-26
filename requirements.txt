@@ -1,4 +1,4 @@
 pyodbc
 bs4
 Pillow
-
+requests
