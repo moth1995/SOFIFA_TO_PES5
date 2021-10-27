@@ -115,7 +115,7 @@ def convert_stats(stats,reg_pos,posiciones,overall,weak_foot, skill_moves,attack
     PES5_Agression = 75     # no formula for this stat yet
     PES5_Mentality = FIFA_composure
     if reg_pos == 0:
-        PES5_Mentality = int(FIFA+composure/2) + 50
+        PES5_Mentality = int(FIFA_composure/2) + 50
     PES5_GK_Skills = int(round((FIFA_GK_handling + FIFA_GK_diving + FIFA_GK_reflexes + FIFA_GK_positioning)/4))
     PES5_Team_Work = FIFA_positioning
     if reg_pos == 0:
