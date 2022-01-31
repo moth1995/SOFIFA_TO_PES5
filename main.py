@@ -192,7 +192,7 @@ def login(username,password,webopt):
     login= BeautifulSoup(r.text,'html.parser').find_all('a',{'class':'bp3-button bp3-minimal need-sign-in'})
     if login!=[]:
         #print("error al loguearse")
-        return False
+        return False, ""
     else:
         login=BeautifulSoup(r.text,'html.parser').find('a',{'class':'bp3-button bp3-minimal block dropdown-toggle'}).text
         #print("usted se ha logueado correctamente como "+login)
@@ -235,7 +235,7 @@ def load_cmb(session,web_opt):
         lgcmb.config(values=leag_names)
 
 def update_webopt(fifa_ver, update_selected, session):
-    global web_opt, updatename
+    global web_opt, updatename,updatelink
     # If update_selected is empty then it comes from fifavercmb
     if update_selected == "":
         #print(fifa_ver)

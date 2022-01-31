@@ -112,7 +112,6 @@ def convert_stats(stats,reg_pos,posiciones,overall,weak_foot, skill_moves,attack
     PES5_Heading = FIFA_heading_accuracy
     PES5_Jump = FIFA_jumping
     PES5_Technique = FIFA_ball_control
-    PES5_Agression = 75     # no formula for this stat yet
     PES5_Mentality = FIFA_composure
     if reg_pos == 0:
         PES5_Mentality = int(FIFA_composure/2) + 50
@@ -124,10 +123,7 @@ def convert_stats(stats,reg_pos,posiciones,overall,weak_foot, skill_moves,attack
     PES5_Condition =int(round(FIFA_stamina/12.5))
     if reg_pos == 0:
         PES5_Condition += 4
-    '''
-    if 'Speed Dribbler (AI)' in traits:
         PES5_Dribbling = 1
-    if 'Technical Dribbler (AI)' in traits:
         PES5_Tactical_Dribble = 1
     if 'Poacher' in s_h:
         PES5_Positioning = 1
@@ -167,14 +163,12 @@ def convert_stats(stats,reg_pos,posiciones,overall,weak_foot, skill_moves,attack
         PES5_1_On_1_Stopper = 1
     if 'Long Throw-in' in traits:
         PES5_Long_Throw = 1
-    '''
+
     PES5_Injury_Tolerance= 'B'
-    '''
     if 'Solid Player' in traits:
         PES5_Injury_Tolerance= 'A'
     elif 'Injury Prone' in traits:
         PES5_Injury_Tolerance= 'C'
-    '''
     
     
     stats_99=[PES5_Attack ,PES5_Defense ,PES5_Balance ,PES5_Stamina ,PES5_Speed ,
@@ -243,39 +237,12 @@ def get_fav_side(posiciones):
 def get_pos_reg(pos):
     return {
         'GK': 0,
-        'CB': 2,
-        'LB': 3,
-        'RB': 3,
-        'CDM': 4,
-        'LWB': 5,
-        'RWB': 5,
-        'CM': 6,
-        'LM': 7,
-        'RM': 7,
-        'CAM': 8,
-        'LW': 9,
-        'RW': 9,
-        'LF': 10,
-        'RF': 10,
-        'CF': 10,
-        'ST': 11   
     }.get(pos, 0)    # si no encontramos la posicion devolvemos 0 que es GK
 
 
 def get_pos(posicion,posiciones):
     equivalencias= {
         0: 0,
-        1: 1,
-        2: 2,
-        3: 3,
-        4: 4,
-        5: 5,
-        6: 6,
-        7: 7,
-        8: 8,
-        9: 9,
-        10: 10,
-        11: 11   
     }
     indice=equivalencias.get(posicion)
     posiciones[indice]=1
@@ -363,7 +330,7 @@ def conseguir_info_jugador(jugador,s):
     if page.status_code==200:
         status_code=page.status_code
         soup = BeautifulSoup(page.text, 'html.parser')
-        name=soup.find_all('h1',attrs={'class':'bp3-text-overflow-ellipsis'})[0].text
+        name=soup.find_all('h1',attrs={'class':'ellipsis'})[0].text
         #print(name)
         overall=int(soup.find_all('section',attrs={'class':'spacing'})[0].select_one('span').text)
         #print(overall)
@@ -383,7 +350,7 @@ def conseguir_info_jugador(jugador,s):
         b=[]
         for item in sofifa_stats[indexes.index('Attacking')].select('li'):
             a.append(int(item.select_one('span:nth-child(odd)').text))
-            b.append(item.find('span',attrs={'class':'tooltip multiline'}).text)
+            b.append(item.find('span',attrs={'role':'tooltip'}).text)
         ofensiva = dict(zip(b, a))
         
         #print(ofensiva)
@@ -395,7 +362,7 @@ def conseguir_info_jugador(jugador,s):
         b=[]
         for item in sofifa_stats[indexes.index('Skill')].select('li'):
             a.append(int(item.select_one('span:nth-child(odd)').text))
-            b.append(item.find('span',attrs={'class':'tooltip multiline'}).text)
+            b.append(item.find('span',attrs={'role':'tooltip'}).text)
         tecnica = dict(zip(b, a))
         
         #print(tecnica)
@@ -407,7 +374,7 @@ def conseguir_info_jugador(jugador,s):
         b=[]
         for item in sofifa_stats[indexes.index('Movement')].select('li'):
             a.append(int(item.select_one('span:nth-child(odd)').text))
-            b.append(item.find('span',attrs={'class':'tooltip multiline'}).text)
+            b.append(item.find('span',attrs={'role':'tooltip'}).text)
         movimiento = dict(zip(b, a))
 
         #movimiento = dict((v,k) for k,v in movimiento.items())
@@ -418,7 +385,7 @@ def conseguir_info_jugador(jugador,s):
         b=[]
         for item in sofifa_stats[indexes.index('Power')].select('li'):
             a.append(int(item.select_one('span:nth-child(odd)').text))
-            b.append(item.find('span',attrs={'class':'tooltip multiline'}).text)
+            b.append(item.find('span',attrs={'role':'tooltip'}).text)
         potencia = dict(zip(b, a))
         
         #print(potencia)
@@ -431,8 +398,8 @@ def conseguir_info_jugador(jugador,s):
             #print(item.find_all('span'))
             d.append(int(item.select_one('span:nth-child(odd)').text))
             if (item.select_one('span:nth-child(even)')) is not None:
-                if item.find('span',attrs={'class':'tooltip multiline'}) is not None:
-                    e.append(item.find('span',attrs={'class':'tooltip multiline'}).text)
+                if item.find('span',attrs={'role':'tooltip'}) is not None:
+                    e.append(item.find('span',attrs={'role':'tooltip'}).text)
                 else:
                     e.append(item.text.split()[-1])
             else:
@@ -446,7 +413,7 @@ def conseguir_info_jugador(jugador,s):
         b=[]
         for item in sofifa_stats[indexes.index('Defending')].select('li'):
             a.append(int(item.select_one('span:nth-child(odd)').text))
-            b.append(item.find('span',attrs={'class':'tooltip multiline'}).text)
+            b.append(item.find('span',attrs={'role':'tooltip'}).text)
         defensa = dict(zip(b, a))
         
         #defensa = dict((v,k) for k,v in defensa.items())
@@ -496,22 +463,22 @@ def conseguir_info_jugador(jugador,s):
         #print(traits)
         foot = sofifa_stats[indexes.index('Profile')].find_all('li')[0].find('label').findNextSibling(text=True)
         #print (foot)
-        weak_foot = int(sofifa_stats[indexes.index('Profile')].find_all('li')[1].find('span').findPreviousSibling(text=True))
+        weak_foot = int(sofifa_stats[indexes.index('Profile')].find_all('li')[1].find('svg').findPreviousSibling(text=True))
         #print(weak_foot)
-        skill_moves = int(sofifa_stats[indexes.index('Profile')].find_all('li')[2].find('span').findPreviousSibling(text=True))
+        skill_moves = int(sofifa_stats[indexes.index('Profile')].find_all('li')[2].find('svg').findPreviousSibling(text=True))
         #print(skill_moves)
-        posiciones=[soup.find_all('div',attrs={'class':'meta bp3-text-overflow-ellipsis'})[0].find_all('span')[x].text for x in range(len(soup.find_all('div',attrs={'class':'meta bp3-text-overflow-ellipsis'})[0].find_all('span')))]
+        posiciones=[soup.find_all('div',attrs={'class':'meta ellipsis'})[0].find_all('span')[x].text for x in range(len(soup.find_all('div',attrs={'class':'meta ellipsis'})[0].find_all('span')))]
         #print(posiciones)
         posicion_reg=posiciones[0]
         #print(posicion_reg)
-        dorsal=int(soup.find('ul', attrs={'class':'bp3-text-overflow-ellipsis pl'}).find_all('li')[2].find('label').findNextSibling(text=True))
+        dorsal=int(soup.find('ul', attrs={'class':'ellipsis pl'}).find_all('li')[2].find('label').findNextSibling(text=True))
         #print(dorsal)
         #club=soup.find('div', attrs={'class':'player-card double-spacing'}).find('a').text
         club=indexes[2]
         #print(club)
-        nation=soup.find_all('div',attrs={'class':'meta bp3-text-overflow-ellipsis'})[0].find('a').get('title')
+        nation=soup.find_all('div',attrs={'class':'meta ellipsis'})[0].find('a').get('title')
         #print(nation)
-        personal_data=soup.find_all('div',attrs={'class':'meta bp3-text-overflow-ellipsis'})[0].find_all('span')[-1].findNextSibling(text=True).split(') ')
+        personal_data=soup.find_all('div',attrs={'class':'meta ellipsis'})[0].find_all('span')[-1].findNextSibling(text=True).split(') ')
         #print(personal_data)
         age = datetime.strptime((personal_data[0].split('(')[1]), '%b %d, %Y').date()
         #print(age)
