@@ -104,7 +104,7 @@ def convert(team,session,namelist,linklist,gamever):
                 process_players+=counter
                 percent.set(str(int((process_players/total_players)*100))+"%")
                 progress_text.set(str(process_players)+"/"+str(total_players)+" players converted")
-                root.update_idletasks()                
+                root.update()                
                 # Line below is for break the loop only when debugging
                 #break
             #print("fin")
@@ -123,7 +123,7 @@ def convert(team,session,namelist,linklist,gamever):
             bar['value']=0
             percent.set("")
             progress_text.set("")
-            root.update_idletasks()
+            root.update()
         else:
             messagebox.showerror(title=appname, message="Please select an output file type")
     else:
@@ -168,12 +168,12 @@ def download_logos(session,league_name,clubnames,clublinks,resize):
             process_logos+=counter
             percent.set(str(int((process_logos/total_logos)*100))+"%")
             progress_text.set(str(process_logos)+"/"+str(total_logos)+" logos downloaded")
-            root.update_idletasks()
+            root.update()
         messagebox.showinfo(title=appname, message="All logos downloaded!")
         bar['value']=0
         percent.set("")
         progress_text.set("")
-        root.update_idletasks()                
+        root.update()                
 
     else:
         messagebox.showerror(title=appname, message="Please select a League")
