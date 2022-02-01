@@ -112,6 +112,31 @@ def convert_stats(stats,reg_pos,posiciones,overall,weak_foot, skill_moves,attack
     PES5_Heading = FIFA_heading_accuracy
     PES5_Jump = FIFA_jumping
     PES5_Technique = FIFA_ball_control
+    # Aggresion
+    if reg_pos == 0:
+        PES5_Agression = 50 + int((FIFA_finishing + PES5_Attack)/12)
+    if reg_pos == 2:
+        PES5_Agression = 50 + int((FIFA_finishing + PES5_Attack)/12)
+    if reg_pos == 3:
+        PES5_Agression = 55 + int((FIFA_finishing + PES5_Attack)/12)
+    if reg_pos == 4:
+        PES5_Agression = 67 + int((FIFA_finishing + PES5_Attack)/12)
+    if reg_pos == 5:
+        PES5_Agression = 60 + int((FIFA_finishing + PES5_Attack)/12)
+    if reg_pos == 6:
+        PES5_Agression = 70 + int((FIFA_finishing + PES5_Attack)/12)
+    if reg_pos == 7:
+        PES5_Agression = 67 + int((FIFA_finishing + PES5_Attack)/12)
+    if reg_pos == 8:
+        PES5_Agression = 70 + int((FIFA_finishing + PES5_Attack)/12)
+    if reg_pos == 9:
+        PES5_Agression = 75 + int((FIFA_finishing + PES5_Attack)/12)
+    if reg_pos == 10:
+        PES5_Agression = 75 + int((FIFA_finishing + PES5_Attack)/12)
+    if reg_pos == 11:
+        PES5_Agression = 80 + int((FIFA_finishing + PES5_Attack)/12)
+    if reg_pos == 12:
+        PES5_Agression = 80 + int((FIFA_finishing + PES5_Attack)/12)
     PES5_Mentality = FIFA_composure
     if reg_pos == 0:
         PES5_Mentality = int(FIFA_composure/2) + 50
@@ -123,43 +148,54 @@ def convert_stats(stats,reg_pos,posiciones,overall,weak_foot, skill_moves,attack
     PES5_Condition =int(round(FIFA_stamina/12.5))
     if reg_pos == 0:
         PES5_Condition += 4
+        if PES5_Condition>=8:
+            PES5_Condition=8
+    # PES5 Special Stats
+    if 'Dribbler' in s_h:
         PES5_Dribbling = 1
+    if ' Speed Dribbler (AI)' in traits:
         PES5_Tactical_Dribble = 1
-    if 'Poacher' in s_h:
+    if FIFA_positioning > 75:
         PES5_Positioning = 1
-    #PES5_Reaction = 1 #no hay formula para esta habilidad especial todavia
+    if FIFA_reactions>79:
+        PES5_Reaction = 1
     if 'Playmaker' in s_h:
         PES5_Playmaking = 1
-    if 'Playmaker (AI)' in traits:
+    if FIFA_short_passng>79:
         PES5_Passing = 1
-    if 'Complete Forward' in s_h:
-        PES5_Scoring = 1
     if 'Clinical Finisher' in s_h:
+        PES5_Scoring = 1
+    if FIFA_finishing>79:
         PES5_1_1_Scoring = 1
-    #PES5_Post_Player = 1 #no hay formula para esta habilidad especial todavia
-    #PES5_Lines = 1 #no hay formula para esta habilidad especial todavia
-    if 'Distance Shooter' in s_h:
+    if reg_pos==12 and 'Strength' in s_h:
+        PES5_Post_Player = 1
+    if 'Complete Forward' in s_h or 'Complete Defender' in s_h:
+        PES5_Lines = 1
+    if 'Distance Shooter' in s_h or 'Long Shot Taker (AI)' in traits:
         PES5_Middle_Shooting = 1
-    if 'Crosser' in s_h:
-        PES5_Side = 1
-    if 'Complete Midfielder' in s_h:
-        PES5_Centre = 1
-    if FIFA_Penaltis>=85:
+    #if 'Crosser' in s_h:
+    #    PES5_Side = 1
+    # According to Mattmid there's no way to get this
+    #if 'Complete Midfielder' in s_h:
+    #    PES5_Centre = 1
+    # According to Mattmid there's no way to get this
+    if FIFA_penalties>=79:
         PES5_Penalties = 1
-    if 'Flair' in traits:
+    if FIFA_volleys>79:
         PES5_1_Touch_Pass = 1
     if 'Outside Foot Shot' in traits:
         PES5_Outside = 1
-    if 'Complete Defender' in s_h:
+    if FIFA_defensive_awareness>79:
         PES5_Marking = 1
     if 'Tackling' in s_h:
         PES5_Sliding = 1
-    if FIFA_Conciencia_defensiva>85:
+    if 'Tactician' in s_h:
         PES5_Covering = 1
     if 'Complete Defender' in s_h:
         PES5_D_Line_Control = 1
-    #PES5_Penalty_Stopper = 1 #no hay formula para esta habilidad especial todavia
-    if 'Saves with Feet' in traits:
+    if FIFA_GK_reflexes>79:
+        PES5_Penalty_Stopper = 1
+    if FIFA_GK_positioning>79:
         PES5_1_On_1_Stopper = 1
     if 'Long Throw-in' in traits:
         PES5_Long_Throw = 1
