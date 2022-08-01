@@ -1,12 +1,12 @@
-import requests
+from requests import Session
 from bs4 import BeautifulSoup
-import time
+from time import sleep
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
 from tkinter import filedialog
-import sys
-import os
+from sys import exit
+from os import path, makedirs
 import conseguir_jugadores
 import jugador
 import savefile
@@ -22,7 +22,7 @@ def get_list_index_by_element(lista, element):
 def get_teamlist(session,url,web_opt):
     #print(website+url+web_opt)
     #print(web_opt)
-    time.sleep(5)
+    #sleep(5)
     site=session.get(website+url+web_opt,headers=headnav)
     #print(site.text)
     #print(site.status_code)
@@ -54,7 +54,7 @@ def get_teamlist(session,url,web_opt):
 
 def get_leagues(session,web_opt):
     #print(web_opt)
-    time.sleep(5)
+    #sleep(5)
     lg_site=session.get(website+'/teams?type=club'+web_opt,headers=headnav)
     if (lg_site.status_code)==200:
         soup=BeautifulSoup(lg_site.text,'html.parser')
@@ -83,12 +83,12 @@ def convert(team,session,namelist,linklist,gamever):
     if team!="":
         if gamever!=0:
             messagebox.showinfo(title=appname, message="Select the folder where you wanna save your file")
-            folder = filedialog.askdirectory(initialdir=os.path.expanduser('~/Documents'),title=appname)
+            folder = filedialog.askdirectory(initialdir=path.expanduser('~/Documents'),title=appname)
             #print(folder)
             if folder == "":
                 return 0
             team=str(linklist[namelist.index(team)])
-            time.sleep(5)
+            sleep(5)
             links,filename = conseguir_jugadores.conseguir_jugadores(team,session)
             #print(filename)
             #print("  ")
@@ -141,24 +141,24 @@ def download_logos(session,league_name,clubnames,clublinks,resize):
     size_32 = 32, 32
     if clublinks!= []:
         messagebox.showinfo(title=appname, message="Select the folder where you wanna save your logos")
-        folder = filedialog.askdirectory(initialdir=os.path.expanduser('~/Documents'),title=appname)
+        folder = filedialog.askdirectory(initialdir=path.expanduser('~/Documents'),title=appname)
         folder = folder + '/' + league_name
-        if not os.path.exists(folder):
-            os.makedirs(folder)
+        if not path.exists(folder):
+            makedirs(folder)
         total_logos = len(clublinks)
         process_logos = 0
         counter = 1            
         for i in range(0,len(clublinks)):
-            time.sleep(5)
+            sleep(5)
             #print (f"downloading https://cdn.sofifa.com/teams/{clublinks[i].split('/')[2]}/360.png")
             img = session.get(f"https://cdn.sofifa.com/teams/{clublinks[i].split('/')[2]}/360.png")
             with open(f"{folder}/{clubnames[i]}.png", "wb") as image:
                 image.write(img.content)
             if (resize):
-                if not os.path.exists(f"{folder}/64"):
-                    os.makedirs(f"{folder}/64")
-                if not os.path.exists(f"{folder}/32"):
-                    os.makedirs(f"{folder}/32")
+                if not path.exists(f"{folder}/64"):
+                    makedirs(f"{folder}/64")
+                if not path.exists(f"{folder}/32"):
+                    makedirs(f"{folder}/32")
                 # first we resize to 64x64
                 im = Image.open(f"{folder}/{clubnames[i]}.png")
                 im.thumbnail(size_64, Image.ANTIALIAS)
@@ -189,7 +189,7 @@ def login(username,password,webopt):
     payload = {'email': username, 'password': password,}
     #print (payload)
     login_page = website+'/api/signIn/'
-    s = requests.Session()
+    s = Session()
     s.post(login_page, data=payload,headers=headnav)
     r=s.get(website,headers=headnav)
     login= BeautifulSoup(r.text,'html.parser').find_all('a',{'class':'bp3-button bp3-minimal need-sign-in'})
@@ -231,8 +231,8 @@ def load_clubs(*args):
 def load_cmb(session,web_opt):
     #print(web_opt)
     global ntnames,ntlinks,wntnames,wntlinks,leag_names,leag_val
-    ntnames,ntlinks=get_teamlist(session,'/teams?type=national&gender=0',web_opt)
     wntnames,wntlinks=get_teamlist(session,'/teams?type=national&gender=1',web_opt)
+    ntnames,ntlinks=get_teamlist(session,'/teams?type=national&gender=0',web_opt)
     leag_names,leag_val=get_leagues(session,web_opt)
     #print(len(ntnames))
     if ntnames!=[]:
@@ -294,7 +294,7 @@ def toggle_password():
 def close():
     loginsc.destroy()
     root.destroy()
-    sys.exit()
+    exit()
 
 def report_callback_exception(self, exc, val, tb):
     messagebox.showerror("Error", message=str(val))
