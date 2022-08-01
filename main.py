@@ -220,6 +220,8 @@ def login(username,password,webopt):
 def load_clubs(*args):
     global clubnames,clublinks
     league_selected=lgcmb.get()
+    #print(league_selected)
+    #print(leag_val[leag_names.index(league_selected)])
     #print(web_opt)
     clubnames,clublinks=get_teamlist(login_session,'/teams?type=club&lg[]='+str(leag_val[leag_names.index(league_selected)]),web_opt)
     clubcmb.config(values=clubnames)
@@ -228,12 +230,15 @@ def load_clubs(*args):
 
 def load_cmb(session,web_opt):
     #print(web_opt)
-    global ntnames,ntlinks,leag_names,leag_val
-    ntnames,ntlinks=get_teamlist(session,'/teams?type=national',web_opt)
+    global ntnames,ntlinks,wntnames,wntlinks,leag_names,leag_val
+    ntnames,ntlinks=get_teamlist(session,'/teams?type=national&gender=0',web_opt)
+    wntnames,wntlinks=get_teamlist(session,'/teams?type=national&gender=1',web_opt)
     leag_names,leag_val=get_leagues(session,web_opt)
     #print(len(ntnames))
     if ntnames!=[]:
         ntcmb.config(values=ntnames)
+    if wntnames!=[]:
+        wntcmb.config(values=wntnames)
     if leag_names!=[]:
         lgcmb.config(values=leag_names)
 
@@ -291,132 +296,142 @@ def close():
     root.destroy()
     sys.exit()
 
-
-website='https://sofifa.com'
-headnav={'User-agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36'}
-login_session=False
-logedusername=""
-web_opt='&hl=en-US&attr=classic&layout=new&units=mks'#+'&r=210064&set=true'
-appname='SOFIFA to PES5/WE9/LE Stats Converter'
-ntnames,ntlinks,leag_names,leag_val,clubnames,clublinks=[],[],[],[],[],[]
-fifavers,fifaverslinks,updatename,updatelink=[],[],[],[]
-root = Tk()
-root.title(appname)
-w = 800 # width for the Tk root
-h = 600 # height for the Tk root
-# get screen width and height
-ws = root.winfo_screenwidth() # width of the screen
-hs = root.winfo_screenheight() # height of the screen
-# calculate x and y coordinates for the Tk root window
-x = (ws/2) - (w/2)
-y = (hs/2) - (h/2)
-# set the dimensions of the screen 
-# and where it is placed
-root.geometry('%dx%d+%d+%d' % (w, h, x, y))
+    messagebox.showerror("Error", message=str(val))
 
 
-loginsc = Toplevel()
-loginsc.title(appname)
-tw=400
-th=350
-tx = (ws/2) - (tw/2)
-ty = (hs/2) - (th/2)
-loginsc.geometry('%dx%d+%d+%d' % (tw, th, tx, ty))
-loginsc.resizable(False, False)
+if __name__ == "__main__":
+    website='https://sofifa.com'
+    headnav={'User-agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36'}
+    login_session=False
+    logedusername=""
+    web_opt='&hl=en-US&attr=classic&layout=new&units=mks'#+'&r=210064&set=true'
+    appname='SOFIFA to PES5/WE9/LE Stats Converter'
+    wntnames,wntlinks,ntnames,ntlinks,leag_names,leag_val,clubnames,clublinks=[],[],[],[],[],[],[],[]
+    fifavers,fifaverslinks,updatename,updatelink=[],[],[],[]
+    root = Tk()
+    root.report_callback_exception = report_callback_exception
+    root.title(appname)
+    w = 800 # width for the Tk root
+    h = 600 # height for the Tk root
+    # get screen width and height
+    ws = root.winfo_screenwidth() # width of the screen
+    hs = root.winfo_screenheight() # height of the screen
+    # calculate x and y coordinates for the Tk root window
+    x = (ws/2) - (w/2)
+    y = (hs/2) - (h/2)
+    # set the dimensions of the screen 
+    # and where it is placed
+    root.geometry('%dx%d+%d+%d' % (w, h, x, y))
+
+
+    loginsc = Toplevel()
+    loginsc.title(appname)
+    tw=400
+    th=350
+    tx = (ws/2) - (tw/2)
+    ty = (hs/2) - (th/2)
+    loginsc.geometry('%dx%d+%d+%d' % (tw, th, tx, ty))
+    loginsc.resizable(False, False)
 
 
 
-username_lbl = Label(loginsc, text = 'E-Mail:')
-username_entry = Entry(loginsc,width=30)
-password_lbl = Label(loginsc, text = 'Password:')
-password_entry = Entry(loginsc,width=30)
-login_button=Button(loginsc,text='Login', command=lambda:login_action(username_entry.get(),password_entry.get(),web_opt))
-exit_button = Button(loginsc,text='Cancel', command=lambda:close())
-logedaslbl=Label(root)
-loginsc.wm_protocol("WM_DELETE_WINDOW", lambda: close())
-root.wm_protocol("WM_DELETE_WINDOW", lambda: close())
-username_entry.bind('<Return>', lambda e: login_action(username_entry.get(),password_entry.get(),web_opt))
-password_entry.bind('<Return>', lambda e: login_action(username_entry.get(),password_entry.get(),web_opt))
-password_entry.default_show_val = password_entry['show']
-password_entry['show'] = "*"
-checkbutton = Checkbutton(loginsc,text="Hide password",onvalue=True,offvalue=False,command=toggle_password)
-checkbutton.var = BooleanVar(value=True)
-checkbutton['variable'] = checkbutton.var
+    username_lbl = Label(loginsc, text = 'E-Mail:')
+    username_entry = Entry(loginsc,width=30)
+    password_lbl = Label(loginsc, text = 'Password:')
+    password_entry = Entry(loginsc,width=30)
+    login_button=Button(loginsc,text='Login', command=lambda:login_action(username_entry.get(),password_entry.get(),web_opt))
+    exit_button = Button(loginsc,text='Cancel', command=lambda:close())
+    logedaslbl=Label(root)
+    loginsc.wm_protocol("WM_DELETE_WINDOW", lambda: close())
+    root.wm_protocol("WM_DELETE_WINDOW", lambda: close())
+    username_entry.bind('<Return>', lambda e: login_action(username_entry.get(),password_entry.get(),web_opt))
+    password_entry.bind('<Return>', lambda e: login_action(username_entry.get(),password_entry.get(),web_opt))
+    password_entry.default_show_val = password_entry['show']
+    password_entry['show'] = "*"
+    checkbutton = Checkbutton(loginsc,text="Hide password",onvalue=True,offvalue=False,command=toggle_password)
+    checkbutton.var = BooleanVar(value=True)
+    checkbutton['variable'] = checkbutton.var
 
 
-username_lbl.pack()
-username_entry.pack()
-password_lbl.pack()
-password_entry.pack()
-checkbutton.pack()
-login_button.pack()
-exit_button.pack()
+    username_lbl.pack()
+    username_entry.pack()
+    password_lbl.pack()
+    password_entry.pack()
+    checkbutton.pack()
+    login_button.pack()
+    exit_button.pack()
 
 
-fifavercmb = ttk.Combobox(root,state="readonly", value=fifavers,width=8)
-updatecmb = ttk.Combobox(root,state="readonly", value=updatename,width=14)
-ntcmb = ttk.Combobox(root,state="readonly", value=ntnames,width=20)
-lgcmb = ttk.Combobox(root,state="readonly", value=leag_names,width=24)
-resize_ckbtn = Checkbutton(root,text="Resize to 64 & 32 px?",onvalue=True,offvalue=False)
-resize_ckbtn.var = BooleanVar(value=False)
-resize_ckbtn['variable'] = resize_ckbtn.var
+    fifavercmb = ttk.Combobox(root,state="readonly", value=fifavers,width=8)
+    updatecmb = ttk.Combobox(root,state="readonly", value=updatename,width=14)
+    ntcmb = ttk.Combobox(root,state="readonly", value=ntnames,width=20)
+    wntcmb = ttk.Combobox(root,state="readonly", value=wntnames,width=20)
+    lgcmb = ttk.Combobox(root,state="readonly", value=leag_names,width=24)
+    resize_ckbtn = Checkbutton(root,text="Resize to 64 & 32 px?",onvalue=True,offvalue=False)
+    resize_ckbtn.var = BooleanVar(value=False)
+    resize_ckbtn['variable'] = resize_ckbtn.var
 
-download_btn = Button(root,text="Download League Logos", command=lambda:download_logos(login_session,lgcmb.get(),clubnames,clublinks,resize_ckbtn.var.get()))
+    download_btn = Button(root,text="Download League Logos", command=lambda:download_logos(login_session,lgcmb.get(),clubnames,clublinks,resize_ckbtn.var.get()))
 
-# Info to the user about the resize option
-my_tip(resize_ckbtn, "If you enable this option it will download all the images\n\
-in their original size but also it will create two folders inside\n\
-one call 64 and other 32 where you can find your resized images")
+    # Info to the user about the resize option
+    my_tip(resize_ckbtn, "If you enable this option it will download all the images\n\
+    in their original size but also it will create two folders inside\n\
+    one call 64 and other 32 where you can find your resized images")
 
-clubcmb = ttk.Combobox(root,state="readonly", value=clubnames,width=24)
-lgcmb.bind("<<ComboboxSelected>>", load_clubs)
-fifa_ver_lbl = Label(root,text='FIFA Version')
-update_lbl = Label(root,text='Update Date')
-fifavercmb.bind("<<ComboboxSelected>>", lambda e: update_webopt(fifavercmb.get(), "", login_session))
-updatecmb.bind("<<ComboboxSelected>>", lambda e: update_webopt("", updatecmb.get(), login_session))
-verlbl = Label(root,text='Select your output file type')
-option = IntVar()
-option.set('0')
-rbtn1 = Radiobutton(root, text='mdb file', variable=option, value=1)
-rbtn2 = Radiobutton(root, text='csv file', variable=option, value=2)
-nt_lbl = Label(root,text='National teams')
-club_lbl = Label(root,text='Club teams')
-nt_convert_btn = Button(root,text='Convert National Team', command=lambda:convert(ntcmb.get(),login_session,ntnames,ntlinks,option.get()))
-club_convert_btn = Button(root,text='Convert Club Team', command=lambda:convert(clubcmb.get(),login_session,clubnames,clublinks,option.get()))
-#con el codigo de abajo creamos un spinbox y le seteamos el valor default a mostrar en 2
-#sb = Spinbox(root, from_=1, to=12)
-#sb.delete(0,"end")
-#sb.insert(0,2)
+    clubcmb = ttk.Combobox(root,state="readonly", value=clubnames,width=24)
+    lgcmb.bind("<<ComboboxSelected>>", load_clubs)
+    fifa_ver_lbl = Label(root,text='FIFA Version')
+    update_lbl = Label(root,text='Update Date')
+    fifavercmb.bind("<<ComboboxSelected>>", lambda e: update_webopt(fifavercmb.get(), "", login_session))
+    updatecmb.bind("<<ComboboxSelected>>", lambda e: update_webopt("", updatecmb.get(), login_session))
+    verlbl = Label(root,text='Select your output file type')
+    option = IntVar()
+    option.set('0')
+    rbtn1 = Radiobutton(root, text='mdb file', variable=option, value=1)
+    rbtn2 = Radiobutton(root, text='csv file', variable=option, value=2)
+    nt_lbl = Label(root,text='National teams')
+    wnt_lbl = Label(root,text='Women\'s National teams')
+    club_lbl = Label(root,text='Club teams')
+    nt_convert_btn = Button(root,text='Convert National Team', command=lambda:convert(ntcmb.get(),login_session,ntnames,ntlinks,option.get()))
+    wnt_convert_btn = Button(root,text='Convert Women\'s\nNational Team', command=lambda:convert(wntcmb.get(),login_session,wntnames,wntlinks,option.get()))
+    club_convert_btn = Button(root,text='Convert Club Team', command=lambda:convert(clubcmb.get(),login_session,clubnames,clublinks,option.get()))
+    #con el codigo de abajo creamos un spinbox y le seteamos el valor default a mostrar en 2
+    #sb = Spinbox(root, from_=1, to=12)
+    #sb.delete(0,"end")
+    #sb.insert(0,2)
 
-percent = StringVar()
-progress_text = StringVar()
-percent.set("")
-progress_text.set("")
-bar = ttk.Progressbar(root,orient=HORIZONTAL,length=300)
-bar.place(x = 260, y = 380)
-percentLabel = Label(root,textvariable=percent).place(x = 260, y = 410)
-taskLabel = Label(root,textvariable=progress_text).place(x = 260, y = 430)
+    percent = StringVar()
+    progress_text = StringVar()
+    percent.set("")
+    progress_text.set("")
+    bar = ttk.Progressbar(root,orient=HORIZONTAL,length=300)
+    bar.place(x = 260, y = 380)
+    percentLabel = Label(root,textvariable=percent).place(x = 260, y = 410)
+    taskLabel = Label(root,textvariable=progress_text).place(x = 260, y = 430)
 
-copyright_lbl = Label(root,text='Developed by PES Indie Team ©')
+    copyright_lbl = Label(root,text='Developed by PES Indie Team ©')
 
-logedaslbl.place(x = 0, y= 0)
-fifa_ver_lbl.place(x=1,y=35)
-update_lbl.place(x=80,y=35)
-fifavercmb.place(x=1,y=60)
-updatecmb.place(x=80,y=60)
-nt_lbl.place(x = 250, y = 175)
-club_lbl.place(x = 400, y = 175)
-ntcmb.place(x = 250, y = 200)
-lgcmb.place(x = 400, y = 200)
-download_btn.place(x = 600, y = 200)
-resize_ckbtn.place(x = 600, y = 240)
-clubcmb.place(x = 400, y = 240)
-nt_convert_btn.place(x = 250, y = 280)
-club_convert_btn.place(x = 410 , y = 280)
-verlbl.place(x = 340, y = 320)
-rbtn1.place(x = 340, y = 340)
-rbtn2.place(x = 420, y = 340)
-copyright_lbl.place(x = 1, y = 580)
-root.resizable(False, False)
-root.withdraw()
-root.mainloop() 
+    logedaslbl.place(x = 0, y= 0)
+    fifa_ver_lbl.place(x=1,y=35)
+    update_lbl.place(x=80,y=35)
+    fifavercmb.place(x=1,y=60)
+    updatecmb.place(x=80,y=60)
+    nt_lbl.place(x = 100, y = 175)
+    wnt_lbl.place(x = 250, y = 175)
+    club_lbl.place(x = 400, y = 175)
+    ntcmb.place(x = 100, y = 200)
+    wntcmb.place(x = 250, y = 200)
+    lgcmb.place(x = 400, y = 200)
+    download_btn.place(x = 600, y = 200)
+    resize_ckbtn.place(x = 600, y = 240)
+    clubcmb.place(x = 400, y = 240)
+    nt_convert_btn.place(x = 100, y = 280)
+    wnt_convert_btn.place(x = 270, y = 280)
+    club_convert_btn.place(x = 410 , y = 280)
+    verlbl.place(x = 340, y = 320)
+    rbtn1.place(x = 340, y = 340)
+    rbtn2.place(x = 420, y = 340)
+    copyright_lbl.place(x = 1, y = 580)
+    root.resizable(False, False)
+    root.withdraw()
+    root.mainloop()
