@@ -84,6 +84,9 @@ def convert(team,session,namelist,linklist,gamever):
         if gamever!=0:
             messagebox.showinfo(title=appname, message="Select the folder where you wanna save your file")
             folder = filedialog.askdirectory(initialdir=os.path.expanduser('~/Documents'),title=appname)
+            #print(folder)
+            if folder == "":
+                return 0
             team=str(linklist[namelist.index(team)])
             time.sleep(5)
             links,filename = conseguir_jugadores.conseguir_jugadores(team,session)
