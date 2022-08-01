@@ -296,6 +296,7 @@ def close():
     root.destroy()
     sys.exit()
 
+def report_callback_exception(self, exc, val, tb):
     messagebox.showerror("Error", message=str(val))
 
 
